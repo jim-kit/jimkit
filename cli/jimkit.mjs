@@ -161,7 +161,7 @@ Inside a Jimkit checkout this folder is \`addons/${id}\`: \`npm run dev\` and op
 2. Bump \`version\` in package.json, then \`git tag v0.1.0 && git push --tags\`. The workflow in \`.github/workflows\` builds
    \`dist/jimkit-kit.json\` and attaches it to a release. Without the workflow: \`jimkit kits pack\`, then
    \`gh release create v0.1.0 dist/jimkit-kit.json\`.
-3. People add it from Jimkit's Kits screen by pasting \`you/your-repository\`. To be listed there, open a pull request on the registry.
+3. People add it from Jimkit's Kits screen by pasting \`you/your-repository\`. To be listed there, submit it at https://jimkit.thejimmy.dev/kits/submit/ (sign in with GitHub; a maintainer approves new kits).
 `);
   const c = readConfig();
   if (Array.isArray(c.addons) && !c.addons.includes(id)) { c.addons.push(id); writeConfig(c); }
