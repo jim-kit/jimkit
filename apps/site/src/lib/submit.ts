@@ -28,3 +28,19 @@ export function submitError(e: { code?: string; message?: string }): string {
   if (e.code === "23514") return "That doesn't look like a valid repository name.";
   return "Something went wrong. Try again in a moment.";
 }
+
+export interface RepoChoice { repo: string; name: string; description: string; fork: boolean }
+
+/**
+ * The repositories someone can pick from, out of GitHub's list of their public repositories: newest push first, without archived ones
+ * and without those already submitted. Whatever the API sent that doesn't look like a repository is ignored.
+ */
+export function repoChoices(rows: unknown, taken: Iterable<string> = []): RepoChoice[] {
+  if (!Array.isArray(rows)) return [];
+  const skip = new Set([...taken].map((t) => t.toLowerCase()));
+  return rows
+    .filter((r): r is { full_name: string; name: string; description?: string | null; fork?: boolean; archived?: boolean; pushed_at?: string | null } => !!r && typeof r.full_name === "string" && typeof r.name === "string" && /\/[A-Za-z0-9._-]+$/.test(r.full_name))
+    .filter((r) => !r.archived && !skip.has(r.full_name.toLowerCase()))
+    .sort((a, b) => String(b.pushed_at ?? "").localeCompare(String(a.pushed_at ?? "")))
+    .map((r) => ({ repo: r.full_name.toLowerCase(), name: r.name, description: (r.description ?? "").slice(0, 80), fork: r.fork === true }));
+}

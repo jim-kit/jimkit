@@ -6,7 +6,7 @@ import { accentVars } from "../src/lib/accent";
 import { renderDoc } from "../src/lib/docs";
 import { fileMatches, offersFor } from "../src/lib/offers";
 import { loadBuiltInKits, normalizeKits } from "../src/lib/registry";
-import { hasKitRelease, parseRepo, statusText, submitError } from "../src/lib/submit";
+import { hasKitRelease, parseRepo, repoChoices, statusText, submitError } from "../src/lib/submit";
 import { sha256Js } from "../src/lib/sha256";
 
 const bytes = (s: string) => new TextEncoder().encode(s);
@@ -116,6 +116,19 @@ describe("submitting a kit", () => {
     expect(hasKitRelease([{ assets: [{ name: "jimkit-kit.json" }] }])).toBe(true);
     expect(hasKitRelease([{ draft: true, assets: [{ name: "jimkit-kit.json" }] }, { assets: [{ name: "other.zip" }] }])).toBe(false);
     expect(hasKitRelease({ message: "rate limited" })).toBeNull();
+  });
+  it("offers the person's public repositories, newest push first, without archived or already submitted ones", () => {
+    const api = [
+      { full_name: "Ada/old", name: "old", pushed_at: "2025-01-01T00:00:00Z" },
+      { full_name: "Ada/word-count", name: "word-count", description: "Counts words", pushed_at: "2026-10-01T00:00:00Z" },
+      { full_name: "Ada/dusk", name: "dusk", fork: true, pushed_at: "2026-09-01T00:00:00Z" },
+      { full_name: "Ada/archived", name: "archived", archived: true, pushed_at: "2026-10-05T00:00:00Z" },
+      { full_name: "Ada/listed", name: "listed", pushed_at: "2026-10-02T00:00:00Z" },
+      null, { nonsense: true },
+    ];
+    expect(repoChoices(api, ["ada/listed"]).map((c) => c.repo)).toEqual(["ada/word-count", "ada/dusk", "ada/old"]);
+    expect(repoChoices(api)[0]).toMatchObject({ name: "listed" });
+    expect(repoChoices({ message: "rate limited" })).toEqual([]);
   });
   it("says what happened in words", () => {
     expect(statusText("pending")).toBe("Waiting for approval");
