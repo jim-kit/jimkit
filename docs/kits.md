@@ -82,7 +82,7 @@ GitHub can't be reached it shows the last copy it had).
 
 - **Listing a kit**: sign in with GitHub on [the submit page](https://jimkit.thejimmy.dev/kits/submit/) and enter your repository. You can
   submit repositories under your own GitHub name, and it needs a release with a valid `jimkit-kit.json`. A maintainer then reviews every new
-  kit by hand; until then it is shown as waiting for approval. After that, new releases of the kit appear on their own.
+  kit by hand, on an admin page only registry admins can open; until then it is shown as waiting for approval. After that, new releases of the kit appear on their own.
 - **Reviewing**: *Write a review* in the kit's page opens the kit's page on the website, where you sign in with GitHub and give one to five
   stars and a few words. You can't review your own kit; one review per person per kit; you can change or delete yours.
 - **Versions**: every release's hash is recorded the first time it is seen and never changed.

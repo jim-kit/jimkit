@@ -6,7 +6,7 @@ import { accentVars } from "../src/lib/accent";
 import { renderDoc } from "../src/lib/docs";
 import { fileMatches, offersFor } from "../src/lib/offers";
 import { loadBuiltInKits, normalizeKits } from "../src/lib/registry";
-import { hasKitRelease, parseRepo, repoChoices, statusText, submitError } from "../src/lib/submit";
+import { groupKits, hasKitRelease, parseRepo, repoChoices, statusText, submitError } from "../src/lib/submit";
 import { sha256Js } from "../src/lib/sha256";
 
 const bytes = (s: string) => new TextEncoder().encode(s);
@@ -134,5 +134,15 @@ describe("submitting a kit", () => {
     expect(statusText("pending")).toBe("Waiting for approval");
     expect(submitError({ code: "23505" })).toMatch(/already/);
     expect(submitError({ message: 'new row violates row-level security policy for table "kits"' })).toMatch(/20 kits/);
+  });
+});
+
+describe("the admin page", () => {
+  it("groups kits by status, newest first", () => {
+    const k = (repo: string, status: "pending" | "approved" | "rejected", created_at: string) => ({ repo, submitted_by: "a", status, note: null, created_at });
+    const g = groupKits([k("a/old", "pending", "2026-10-01"), k("a/new", "pending", "2026-10-10"), k("a/ok", "approved", "2026-10-05"), k("a/no", "rejected", "2026-10-06")]);
+    expect(g.pending.map((x) => x.repo)).toEqual(["a/new", "a/old"]);
+    expect(g.approved).toHaveLength(1);
+    expect(g.rejected).toHaveLength(1);
   });
 });

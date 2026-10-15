@@ -44,3 +44,12 @@ export function repoChoices(rows: unknown, taken: Iterable<string> = []): RepoCh
     .sort((a, b) => String(b.pushed_at ?? "").localeCompare(String(a.pushed_at ?? "")))
     .map((r) => ({ repo: r.full_name.toLowerCase(), name: r.name, description: (r.description ?? "").slice(0, 80), fork: r.fork === true }));
 }
+
+export interface AdminKit { repo: string; submitted_by: string; status: Status; note: string | null; created_at: string }
+
+/** The kits for the admin page, in the order a maintainer works through them: waiting first, then approved, then the rest; newest first inside each. */
+export function groupKits(kits: AdminKit[]): Record<Status, AdminKit[]> {
+  const out: Record<Status, AdminKit[]> = { pending: [], approved: [], rejected: [] };
+  for (const k of [...kits].sort((a, b) => b.created_at.localeCompare(a.created_at))) out[k.status]?.push(k);
+  return out;
+}
