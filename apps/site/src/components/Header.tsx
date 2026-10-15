@@ -17,7 +17,7 @@ const NAV = [
   { href: "/#workbench", label: "Try it" },
   { href: "/#tools", label: "Tools" },
   { href: "/#looks", label: "Looks" },
-  { href: "/#kits", label: "Kits" },
+  { href: "/kits/", label: "Kits" },
   { href: "/#install", label: "Install" },
   { href: "/docs/", label: "Docs" },
 ];
