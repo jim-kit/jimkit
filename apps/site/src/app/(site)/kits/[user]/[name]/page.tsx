@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { JsonLd } from "@/components/JsonLd";
+import { ReviewBox } from "@/components/ReviewBox";
 import { loadCommunityKits } from "@/lib/registry";
 import { absolute } from "@/lib/site";
 
@@ -77,6 +78,8 @@ export default async function KitPage({ params }: { params: Promise<{ user: stri
           ))}
         </ul>
       ) : <p className="mt-3 text-[15px] text-dim">None yet.</p>}
+      <h3 className="mt-8 text-[1.15rem] font-semibold">Write a review</h3>
+      <ReviewBox repo={k.repo} versions={k.versions.map((v) => v.version)} />
 
       <h2 className="font-display mt-14 text-[1.9rem]">Versions</h2>
       <div className="jk-card mt-4 overflow-x-auto rounded-xl">

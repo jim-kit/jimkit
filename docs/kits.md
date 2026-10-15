@@ -75,16 +75,14 @@ runs it with `npx @jimkit/pack`, which works once that package is on npm. Until 
 
 ## The registry
 
-The registry is a Git repository (`jim-kit/registry` by default): a list of GitHub links with the reviews beside them. It hosts no code. Each
-kit is a file `kits/<user>/<name>.json` holding `{"repo": "user/name"}`; everything else comes from the kit's releases. A script
-reads the releases and the reviews and writes `index.json`, which is the only thing Jimkit fetches (every ten minutes at most; if
+The registry (`jim-kit/registry` by default) is a small database of GitHub links and reviews. It hosts no code: a kit lives in its author's
+repository and everything shown about it comes from its releases. Every hour a script reads the approved kits and the reviews, looks at each
+kit's releases, and writes `index.json` into the registry's repository. That file is the only thing Jimkit fetches (every ten minutes at most; if
 GitHub can't be reached it shows the last copy it had).
 
-- **Listing a kit**: a pull request adding that one file, from the GitHub account that owns the repository. The check fails if
-  the repository has no release with a valid `jimkit-kit.json`. A maintainer then reviews every new listing by hand before it is merged;
-  after that, new releases of the kit appear on their own.
-- **Reviewing**: *Write a review* in the kit's page opens GitHub's new-file page with `reviews/<user>/<name>/<you>.json` filled in
-  (a rating from 1 to 5, a few words, the version you used). You commit it as a pull request, so the review is attributed to your
-  GitHub account and the check can verify that. You can't review your own kit; one review per person per kit; send a new pull
-  request to change or withdraw yours.
+- **Listing a kit**: sign in with GitHub on [the submit page](https://jimkit.thejimmy.dev/kits/submit/) and enter your repository. You can
+  submit repositories under your own GitHub name, and it needs a release with a valid `jimkit-kit.json`. A maintainer then reviews every new
+  kit by hand; until then it is shown as waiting for approval. After that, new releases of the kit appear on their own.
+- **Reviewing**: *Write a review* in the kit's page opens the kit's page on the website, where you sign in with GitHub and give one to five
+  stars and a few words. You can't review your own kit; one review per person per kit; you can change or delete yours.
 - **Versions**: every release's hash is recorded the first time it is seen and never changed.

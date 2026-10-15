@@ -29,7 +29,7 @@ export default async function KitsPage() {
       <JsonLd data={[{ "@context": "https://schema.org", "@type": "CollectionPage", name: "Jimkit kits", url: absolute("/kits/"), hasPart: community.map((k) => ({ "@type": "SoftwareApplication", name: k.name, url: absolute(`/kits/${k.repo}/`) })) }]} />
       <div className="flex flex-wrap items-baseline justify-between gap-3">
         <h1 className="font-display text-[clamp(2.2rem,4.6vw,3.6rem)] leading-none">Kits</h1>
-        <Link href="/docs/kits/" className="text-[14px] text-dim hover:text-fg">List your kit</Link>
+        <Link href="/kits/submit/" className="text-[14px] text-dim hover:text-fg">List your kit</Link>
       </div>
       <KitGrid kits={cards} />
     </main>

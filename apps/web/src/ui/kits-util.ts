@@ -27,6 +27,14 @@ export interface ReviewDraft {
   version?: string;
 }
 
+/** Where the project's own registry takes reviews: its website, where a reviewer signs in with GitHub. Another registry keeps the pull-request way below. */
+export const DEFAULT_REGISTRY_REPO = "jim-kit/registry";
+export const REGISTRY_SITE = "https://jimkit.thejimmy.dev";
+export function reviewPage(registry: string, kit: string): string | null {
+  const k = parseSource(kit);
+  return registry.toLowerCase() === DEFAULT_REGISTRY_REPO && k ? `${REGISTRY_SITE}/kits/${k.user.toLowerCase()}/${k.name.toLowerCase()}/#review` : null;
+}
+
 /**
  * GitHub's "create a new file" page, filled in: the reviewer commits the file to their fork and opens a pull request, so the
  * registry knows the review comes from that GitHub account. No Jimkit server, no accounts of ours.

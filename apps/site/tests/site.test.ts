@@ -6,6 +6,7 @@ import { accentVars } from "../src/lib/accent";
 import { renderDoc } from "../src/lib/docs";
 import { fileMatches, offersFor } from "../src/lib/offers";
 import { loadBuiltInKits, normalizeKits } from "../src/lib/registry";
+import { hasKitRelease, parseRepo, statusText, submitError } from "../src/lib/submit";
 import { sha256Js } from "../src/lib/sha256";
 
 const bytes = (s: string) => new TextEncoder().encode(s);
@@ -98,5 +99,27 @@ describe("the kit directory", () => {
     expect(normalizeKits({ kits: "no" })).toEqual([]);
     expect(normalizeKits({ kits: [{ repo: "a/b", name: "x", versions: [{ version: 3 }] }] })).toEqual([]);
     expect(normalizeKits({ kits: [{ repo: "a/b", name: "x", homepage: "javascript:alert(1)", versions: [{ version: "1.0.0" }] }] })[0].homepage).toBeUndefined();
+  });
+});
+
+describe("submitting a kit", () => {
+  it("accepts your own repository, however it is written", () => {
+    for (const input of ["ada/word-count", " Ada/Word-Count ", "https://github.com/Ada/word-count", "github.com/ada/word-count.git", "ada/word-count/"]) expect(parseRepo(input, "Ada")).toEqual({ repo: "ada/word-count" });
+  });
+  it("refuses someone else's repository, a bad name and nothing at all", () => {
+    expect(parseRepo("grace/tool", "ada")).toMatchObject({ error: expect.stringContaining("own GitHub name") });
+    expect(parseRepo("ada", "ada")).toHaveProperty("error");
+    expect(parseRepo("ada/with space", "ada")).toHaveProperty("error");
+    expect(parseRepo("  ", "ada")).toHaveProperty("error");
+  });
+  it("looks for a release that carries the kit file", () => {
+    expect(hasKitRelease([{ assets: [{ name: "jimkit-kit.json" }] }])).toBe(true);
+    expect(hasKitRelease([{ draft: true, assets: [{ name: "jimkit-kit.json" }] }, { assets: [{ name: "other.zip" }] }])).toBe(false);
+    expect(hasKitRelease({ message: "rate limited" })).toBeNull();
+  });
+  it("says what happened in words", () => {
+    expect(statusText("pending")).toBe("Waiting for approval");
+    expect(submitError({ code: "23505" })).toMatch(/already/);
+    expect(submitError({ message: 'new row violates row-level security policy for table "kits"' })).toMatch(/20 kits/);
   });
 });

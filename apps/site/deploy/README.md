@@ -94,6 +94,8 @@ for each one. The index is fetched once while the site is built, so a new listin
 can't be reached, the site still builds, without community kits.
 
 - `REGISTRY_INDEX_URL` (build variable) reads another registry's index, for a fork.
+- Submitting kits and writing reviews use the registry's Supabase database from the browser (`/kits/submit` and each kit's page). A fork with
+  its own registry sets `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_KEY` (the publishable key, which is public by design) at build time.
 - To rebuild automatically when the registry changes, create a deploy hook for the project in Cloudflare (Settings → Builds → Deploy hooks)
   and save its address as the secret `SITE_DEPLOY_HOOK` in the registry repository. Its Index workflow calls it whenever `index.json` changes.
   Without the hook, the next push to this repository rebuilds the site.

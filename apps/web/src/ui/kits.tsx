@@ -5,7 +5,7 @@ import { hasBuiltInIcon, Btn, Icon, Seg, toast, useDialogFocus, useOverlayEscape
 import { ArrowLeft, ExternalLink, Server, ShieldAlert, ShieldCheck, Star, X } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { InstalledView, Preview, RegistryKit, StoreView } from "@/core/store/types";
-import { formatBytes, matchKits, reviewUrl, sourceFromQuery, updateFor } from "./kits-util";
+import { formatBytes, matchKits, reviewPage, reviewUrl, sourceFromQuery, updateFor } from "./kits-util";
 import { useApp } from "./providers";
 import { saveJson } from "./save";
 
@@ -176,7 +176,7 @@ function Detail({ kit, store, installed, onBack, onLook }: { kit: RegistryKit; s
       <Heading>Reviews</Heading>
       <div className="flex items-center justify-between gap-2">
         <Rating kit={kit} />
-        {store.registry.repo && !writing && <Btn onClick={() => setWriting(true)}>Write a review</Btn>}
+        {store.registry.repo && !writing && <Btn onClick={() => { const page = reviewPage(store.registry.repo!, kit.repo); if (page) window.open(page, "_blank", "noopener"); else setWriting(true); }}>Write a review</Btn>}
       </div>
       {writing && store.registry.repo && <ReviewForm kit={kit} registry={store.registry.repo} installed={installed?.version} onClose={() => setWriting(false)} />}
       {kit.reviews.length > 0 && (

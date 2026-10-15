@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { RegistryKit } from "@/core/store/types";
-import { matchKits, reviewUrl, sourceFromQuery, updateFor } from "@/ui/kits-util";
+import { matchKits, reviewPage, reviewUrl, sourceFromQuery, updateFor } from "@/ui/kits-util";
 
 const kit = (over: Partial<RegistryKit>): RegistryKit => ({ repo: "ada/word-count", name: "Word count", description: "Counts words.", tools: [{ name: "Word count", blurb: "Counts", icon: "PenLine" }], latest: "1.2.0", versions: [], rating: null, reviews: [], ...over });
 
@@ -27,6 +27,16 @@ describe("updateFor", () => {
     expect(updateFor(installed, [kit({ latest: "1.2.0" })])).toBe("1.2.0");
     expect(updateFor({ ...installed, version: "1.2.0" }, [kit({ latest: "1.2.0" })])).toBeNull();
     expect(updateFor(installed, [])).toBeNull();
+  });
+});
+
+describe("reviewPage", () => {
+  it("sends a review of the project's registry to its website, where reviewers sign in with GitHub", () => {
+    expect(reviewPage("jim-kit/registry", "Ada/Word-Count")).toBe("https://jimkit.thejimmy.dev/kits/ada/word-count/#review");
+  });
+  it("leaves another registry on the pull-request way", () => {
+    expect(reviewPage("someone/registry", "ada/word-count")).toBeNull();
+    expect(reviewPage("jim-kit/registry", "nonsense")).toBeNull();
   });
 });
 
