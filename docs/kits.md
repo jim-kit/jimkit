@@ -58,7 +58,7 @@ your kit follows every theme. To publish:
 1. Put the folder in a GitHub repository. Its address, `you/word-count`, is how people find it.
 2. Set `version` in `package.json` and tag it: `git tag v1.0.0 && git push --tags`. The workflow the scaffold made builds the file
    and attaches it to the release. By hand: `gh release create v1.0.0 dist/jimkit-kit.json`.
-3. Anyone can add it now by pasting `you/word-count`. To be in Browse, open a pull request on the registry (below).
+3. Anyone can add it now by pasting `you/word-count`. To be in Browse, [submit it](https://jimkit.thejimmy.dev/kits/submit/) (see the registry, below).
 
 Rules that come from how installs work:
 
