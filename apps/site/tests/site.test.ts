@@ -1,10 +1,11 @@
-import { mkdtempSync, writeFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { accentVars } from "../src/lib/accent";
 import { renderDoc } from "../src/lib/docs";
 import { fileMatches, offersFor } from "../src/lib/offers";
+import { loadBuiltInKits, normalizeKits } from "../src/lib/registry";
 import { sha256Js } from "../src/lib/sha256";
 
 const bytes = (s: string) => new TextEncoder().encode(s);
@@ -75,5 +76,27 @@ describe("rendering a doc", () => {
     const { html } = render("```sh\necho hi\n```\n\n| a | b |\n|---|---|\n| 1 | 2 |\n");
     expect(html).toContain('<div class="doc-code"><button type="button" data-copy');
     expect(html).toContain('<div class="doc-table"><table>');
+  });
+});
+
+describe("the kit directory", () => {
+  it("lists the built-in kits, tool kits first and the looks after them", () => {
+    const kits = loadBuiltInKits();
+    expect(kits.map((k) => k.id)).toEqual(expect.arrayContaining(["text", "convert", "theme-glass", "theme-metro", "theme-paper"]));
+    const firstLook = kits.findIndex((k) => k.looks.length && !k.tools.length);
+    expect(kits.slice(firstLook).every((k) => k.looks.length && !k.tools.length)).toBe(true);
+  });
+  it("reads the registry's index and drops what is malformed", () => {
+    const kits = normalizeKits(JSON.parse(readFileSync(join(__dirname, "fixtures/registry-index.json"), "utf8")));
+    expect(kits.map((k) => k.repo)).toEqual(["ada/word-count", "ada/dusk"]);
+    expect(kits[0]).toMatchObject({ latest: "1.3.0", rating: { average: 4.5, count: 2 }, stars: 12 });
+    expect(kits[0].versions[0].date).toBe("2026-10-10");
+    expect(kits[1].looks[0].name).toBe("Dusk");
+  });
+  it("accepts nothing it can't make sense of", () => {
+    expect(normalizeKits(null)).toEqual([]);
+    expect(normalizeKits({ kits: "no" })).toEqual([]);
+    expect(normalizeKits({ kits: [{ repo: "a/b", name: "x", versions: [{ version: 3 }] }] })).toEqual([]);
+    expect(normalizeKits({ kits: [{ repo: "a/b", name: "x", homepage: "javascript:alert(1)", versions: [{ version: "1.0.0" }] }] })[0].homepage).toBeUndefined();
   });
 });

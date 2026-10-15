@@ -81,7 +81,8 @@ reads the releases and the reviews and writes `index.json`, which is the only th
 GitHub can't be reached it shows the last copy it had).
 
 - **Listing a kit**: a pull request adding that one file, from the GitHub account that owns the repository. The check fails if
-  the repository has no release with a valid `jimkit-kit.json`.
+  the repository has no release with a valid `jimkit-kit.json`. A maintainer then reviews every new listing by hand before it is merged;
+  after that, new releases of the kit appear on their own.
 - **Reviewing**: *Write a review* in the kit's page opens GitHub's new-file page with `reviews/<user>/<name>/<you>.json` filled in
   (a rating from 1 to 5, a few words, the version you used). You commit it as a pull request, so the review is attributed to your
   GitHub account and the check can verify that. You can't review your own kit; one review per person per kit; send a new pull

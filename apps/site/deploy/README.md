@@ -87,6 +87,17 @@ curl -s  https://jimkit.example.org/sitemap.xml | head    # every page, with the
 curl -sI http://jimkit.example.org/ | grep -i location    # redirects to https
 ```
 
+## The kit directory
+
+`/kits` lists the kits that come built in (read from the addon manifests) and the community kits from the registry's `index.json`, with a page
+for each one. The index is fetched once while the site is built, so a new listing or review appears after the next build. If the registry
+can't be reached, the site still builds, without community kits.
+
+- `REGISTRY_INDEX_URL` (build variable) reads another registry's index, for a fork.
+- To rebuild automatically when the registry changes, create a deploy hook for the project in Cloudflare (Settings → Builds → Deploy hooks)
+  and save its address as the secret `SITE_DEPLOY_HOOK` in the registry repository. Its Index workflow calls it whenever `index.json` changes.
+  Without the hook, the next push to this repository rebuilds the site.
+
 ## 5. Search engines
 
 Everything a crawler needs is generated: `robots.txt`, `sitemap.xml`, a web manifest, `llms.txt` (a plain-text summary for language

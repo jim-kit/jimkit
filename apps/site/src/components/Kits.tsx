@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Reveal } from "./Reveal";
 import { Section } from "./Section";
 import { Terminal } from "./Terminal";
@@ -47,6 +48,9 @@ export function Kits() {
                 <li><span className="text-fg">Server code is not sandboxed.</span> A kit's server route runs with the app's permissions, so install kits you would read.</li>
               </ul>
             </div>
+          </Reveal>
+          <Reveal delay={3}>
+            <Link href="/kits/" className="jk-btn inline-flex rounded-lg border border-line-strong px-6 py-3.5 text-[15px] font-semibold transition hover:bg-tint-2">Browse the kits</Link>
           </Reveal>
         </div>
       </div>

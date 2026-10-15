@@ -14,7 +14,7 @@ export function Footer({ version }: { version: string }) {
           <p className="mt-3 max-w-xs text-[14px] leading-relaxed text-dim">Your tools, unified.</p>
         </div>
         <div><h4 className={head}>Product</h4>
-          <ul className={col}>{[["Workbench", "/#workbench"], ["Tools", "/#tools"], ["Arrange", "/#playground"], ["Looks", "/#looks"], ["Kits", "/#kits"], ["Install", "/#install"]].map(([l, h]) => <li key={h}><Link className={a} href={h}>{l}</Link></li>)}</ul></div>
+          <ul className={col}>{[["Workbench", "/#workbench"], ["Tools", "/#tools"], ["Arrange", "/#playground"], ["Looks", "/#looks"], ["Kits", "/kits/"], ["Install", "/#install"]].map(([l, h]) => <li key={h}><Link className={a} href={h}>{l}</Link></li>)}</ul></div>
         <div><h4 className={head}>Docs</h4>
           <ul className={col}>{DOCS.slice(0, 5).map((d) => <li key={d.slug}><Link className={a} href={`/docs/${d.slug}/`}>{d.title}</Link></li>)}</ul></div>
         <div><h4 className={head}>Project</h4>
