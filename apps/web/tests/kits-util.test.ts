@@ -32,7 +32,7 @@ describe("updateFor", () => {
 
 describe("reviewPage", () => {
   it("sends a review of the project's registry to its website, where reviewers sign in with GitHub", () => {
-    expect(reviewPage("jim-kit/registry", "Ada/Word-Count")).toBe("https://jimkit.thejimmy.dev/kits/ada/word-count/#review");
+    expect(reviewPage("jim-kit/registry", "Ada/Word-Count")).toBe("https://jimkit.thejimmy.dev/kits/view/?repo=ada/word-count#review");
   });
   it("leaves another registry on the pull-request way", () => {
     expect(reviewPage("someone/registry", "ada/word-count")).toBeNull();

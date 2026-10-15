@@ -1,44 +1,39 @@
-import type { Metadata } from "next";
+"use client";
+
 import Link from "next/link";
-import { JsonLd } from "@/components/JsonLd";
-import { ReviewBox } from "@/components/ReviewBox";
-import { loadCommunityKits } from "@/lib/registry";
-import { absolute } from "@/lib/site";
+import { useEffect, useState } from "react";
+import { fetchCommunityKits, type CommunityKit } from "@/lib/registry-data";
+import { ReviewBox } from "./ReviewBox";
 
-export const dynamicParams = false;
-
-/** A static export needs at least one page here, so while the registry lists nothing there is one placeholder, which says so and is kept out of search results. */
-export async function generateStaticParams() {
-  const kits = await loadCommunityKits();
-  return kits.length ? kits.map((k) => { const [user, name] = k.repo.split("/"); return { user, name }; }) : [{ user: "none", name: "listed" }];
-}
-
-const find = async (user: string, name: string) => (await loadCommunityKits()).find((k) => k.repo === `${user}/${name}`.toLowerCase());
 const stars = (n: number) => "★".repeat(Math.round(n)) + "☆".repeat(5 - Math.round(n));
 const size = (b: number) => (b >= 1048576 ? `${(b / 1048576).toFixed(1)} MB` : `${Math.max(1, Math.round(b / 1024))} kB`);
 
-export async function generateMetadata({ params }: { params: Promise<{ user: string; name: string }> }): Promise<Metadata> {
-  const { user, name } = await params;
-  const k = await find(user, name);
-  if (!k) return { title: "Kit not found", robots: { index: false, follow: false } };
-  return { title: `${k.name}: a kit for Jimkit`, description: k.description || `${k.name} is a kit for Jimkit.`, alternates: { canonical: `/kits/${k.repo}/` } };
-}
+/** One community kit, read from the registry's index when the page opens: /kits/view/?repo=user/name */
+export function KitDetail() {
+  const [state, setState] = useState<{ kit: CommunityKit } | "loading" | "missing" | "error">("loading");
+  useEffect(() => {
+    const repo = (new URLSearchParams(location.search).get("repo") ?? "").trim().toLowerCase();
+    let stale = false;
+    fetchCommunityKits()
+      .then((kits) => { const kit = kits.find((k) => k.repo === repo); if (!stale) setState(kit ? { kit } : "missing"); })
+      .catch(() => { if (!stale) setState("error"); });
+    return () => { stale = true; };
+  }, []);
 
-export default async function KitPage({ params }: { params: Promise<{ user: string; name: string }> }) {
-  const { user, name } = await params;
-  const k = await find(user, name);
-  if (!k) {
+  if (state === "loading") return <p className="mt-6 text-[15px] text-faint">Loading…</p>;
+  if (state === "missing" || state === "error") {
     return (
-      <main className="mx-auto max-w-[1000px] px-5 pb-28 pt-[104px]">
-        <h1 className="font-display text-[clamp(2.2rem,5vw,3.6rem)] leading-[0.98]">That kit is not listed.</h1>
-        <p className="mt-5 max-w-[36rem] text-[1.05rem] leading-relaxed text-dim">It may have been removed from the registry, or it has not been listed yet. <Link href="/kits/" className="text-accent hover:underline">See all kits</Link>.</p>
-      </main>
+      <>
+        <h1 className="font-display mt-4 text-[clamp(2.2rem,5vw,3.6rem)] leading-[0.98]">{state === "error" ? "The registry can't be reached." : "That kit is not listed."}</h1>
+        <p className="mt-5 max-w-[36rem] text-[1.05rem] leading-relaxed text-dim">{state === "error" ? "Try again in a moment." : "It may have been removed from the registry, or it has not been approved yet."} <Link href="/kits/" className="text-accent hover:underline">See all kits</Link>.</p>
+      </>
     );
   }
+  const k = state.kit;
   const [owner, repoName] = k.repo.split("/");
+  document.title = `${k.name}: a kit for Jimkit`;
   return (
-    <main className="mx-auto max-w-[1000px] px-5 pb-28 pt-[104px]">
-      <JsonLd data={[{ "@context": "https://schema.org", "@type": "SoftwareApplication", name: k.name, description: k.description, softwareVersion: k.latest, applicationCategory: "UtilitiesApplication", operatingSystem: "Any", url: absolute(`/kits/${k.repo}/`), codeRepository: `https://github.com/${k.repo}`, ...(k.rating ? { aggregateRating: { "@type": "AggregateRating", ratingValue: k.rating.average, ratingCount: k.rating.count } } : {}) }]} />
+    <>
       <p className="font-mono-label text-faint"><Link href="/kits/" className="hover:text-fg">Kits</Link> / {owner} / {repoName}</p>
       <h1 className="font-display mt-4 text-[clamp(2.4rem,5.4vw,4.4rem)] leading-[0.98]">{k.name}</h1>
       <p className="mt-5 max-w-[40rem] text-[1.1rem] leading-relaxed text-dim">{k.description}</p>
@@ -88,6 +83,6 @@ export default async function KitPage({ params }: { params: Promise<{ user: stri
           <tbody>{k.versions.map((v) => <tr key={v.version} className="border-b border-line last:border-0"><td className="px-4 py-2.5 font-mono">{v.version}</td><td className="px-4 py-2.5 text-dim">{v.date}</td><td className="px-4 py-2.5 text-dim">{size(v.size)}</td><td className="px-4 py-2.5 text-dim">{v.server ? "Yes" : "No"}</td></tr>)}</tbody>
         </table>
       </div>
-    </main>
+    </>
   );
 }

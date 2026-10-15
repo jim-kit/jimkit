@@ -5,7 +5,8 @@ import { describe, expect, it } from "vitest";
 import { accentVars } from "../src/lib/accent";
 import { renderDoc } from "../src/lib/docs";
 import { fileMatches, offersFor } from "../src/lib/offers";
-import { loadBuiltInKits, normalizeKits } from "../src/lib/registry";
+import { loadBuiltInKits } from "../src/lib/registry";
+import { normalizeKits } from "../src/lib/registry-data";
 import { groupKits, hasKitRelease, parseRepo, repoChoices, statusText, submitError } from "../src/lib/submit";
 import { sha256Js } from "../src/lib/sha256";
 

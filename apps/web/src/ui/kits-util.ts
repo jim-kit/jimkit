@@ -32,7 +32,7 @@ export const DEFAULT_REGISTRY_REPO = "jim-kit/registry";
 export const REGISTRY_SITE = "https://jimkit.thejimmy.dev";
 export function reviewPage(registry: string, kit: string): string | null {
   const k = parseSource(kit);
-  return registry.toLowerCase() === DEFAULT_REGISTRY_REPO && k ? `${REGISTRY_SITE}/kits/${k.user.toLowerCase()}/${k.name.toLowerCase()}/#review` : null;
+  return registry.toLowerCase() === DEFAULT_REGISTRY_REPO && k ? `${REGISTRY_SITE}/kits/view/?repo=${k.user.toLowerCase()}/${k.name.toLowerCase()}#review` : null;
 }
 
 /**

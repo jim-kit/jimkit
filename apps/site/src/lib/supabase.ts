@@ -1,7 +1,7 @@
 import type { Session, SupabaseClient } from "@supabase/supabase-js";
 
 /**
- * The registry's database (see the registry repository, supabase/schema.sql). The key is Supabase's publishable one, public by design:
+ * The registry's database. The key is Supabase's publishable one, public by design:
  * what a visitor may do is decided by the database's own rules (row level security), not by this page. A fork points these at its own project.
  */
 export const SUPABASE_URL = (process.env.NEXT_PUBLIC_SUPABASE_URL ?? "https://kjitkrkyuxyfygsdxvcp.supabase.co").replace(/\/+$/, "");

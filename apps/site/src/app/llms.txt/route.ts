@@ -1,12 +1,10 @@
 import { DOCS } from "@/lib/docs-meta";
-import { loadCommunityKits } from "@/lib/registry";
 import { DESCRIPTION, SITE_NAME, absolute } from "@/lib/site";
 
 export const dynamic = "force-static";
 
 /** A plain-text map of the site for language models and other crawlers that read text better than pages (llmstxt.org). */
-export async function GET() {
-  const kits = await loadCommunityKits();
+export function GET() {
   const lines = [
     `# ${SITE_NAME}`,
     "",
@@ -19,7 +17,6 @@ export async function GET() {
     "",
     "## Kits",
     `- [Kits](${absolute("/kits/")}): the kits that come built in, the community kits listed in the registry, and how to list your own`,
-    ...kits.map((k) => `- [${k.name}](${absolute(`/kits/${k.repo}/`)}): ${k.description}`),
     "",
     "## More",
     `- [Changelog](${absolute("/changelog/")}): what changed, release by release`,

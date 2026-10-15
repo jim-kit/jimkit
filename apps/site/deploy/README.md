@@ -89,16 +89,14 @@ curl -sI http://jimkit.example.org/ | grep -i location    # redirects to https
 
 ## The kit directory
 
-`/kits` lists the kits that come built in (read from the addon manifests) and the community kits from the registry's `index.json`, with a page
-for each one. The index is fetched once while the site is built, so a new listing or review appears after the next build. If the registry
-can't be reached, the site still builds, without community kits.
+`/kits` lists the kits that come built in (read from the addon manifests when the site is built) and the community kits, which the browser reads
+from the registry's `index.json` when the page opens. A kit's own page is `/kits/view/?repo=user/name`, read the same way. So a new kit or
+review shows up as soon as the registry rebuilds its index, with **no new deploy of the site**. If the registry can't be reached, the built-in kits
+still show.
 
-- `REGISTRY_INDEX_URL` (build variable) reads another registry's index, for a fork.
-- Submitting kits and writing reviews use the registry's Supabase database from the browser (`/kits/submit` and each kit's page). A fork with
-  its own registry sets `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_KEY` (the publishable key, which is public by design) at build time.
-- To rebuild automatically when the registry changes, create a deploy hook for the project in Cloudflare (Settings → Builds → Deploy hooks)
-  and save its address as the secret `SITE_DEPLOY_HOOK` in the registry repository. Its Index workflow calls it whenever `index.json` changes.
-  Without the hook, the next push to this repository rebuilds the site.
+- `NEXT_PUBLIC_REGISTRY_INDEX_URL` (a build variable) reads another registry's index, for a fork.
+- Submitting kits, writing reviews and the admin page use the registry's Supabase database from the browser. A fork with its own registry sets
+  `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_KEY` (the publishable key, which is public by design) at build time.
 
 ## 5. Search engines
 
