@@ -1,0 +1,35 @@
+/* Cascade layers, lowest to highest. A kit's stylesheet lives in `kit`: below the host's utilities, so a kit's plain `.flex` can
+ * never undo the host's `lg:hidden` (see packages/pack). This line has to come before Tailwind's own layer list. */
+@layer theme, base, components, kit, utilities;
+@import "tailwindcss";
+@import "../generated/sources.css";
+@import "@jimkit/ui/styles.css";
+@import "../generated/themes.css";
+
+/* The design tokens, themes and shared component styles live in @jimkit/ui. */
+@source "../../../../packages/ui/src";
+@source "../ui";
+@source "../app";
+
+/* switching themes: the new look is revealed through a growing circle (see ui/providers.tsx) */
+::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+/* the circle's edge is feathered: its radius is a registered property, animated from providers.tsx */
+@property --jk-r { syntax: "<length>"; inherits: false; initial-value: 0px; }
+html.jk-soft-reveal::view-transition-new(root) {
+  -webkit-mask-image: radial-gradient(circle at var(--jk-x) var(--jk-y), #000 calc(var(--jk-r) - 140px), transparent var(--jk-r));
+  mask-image: radial-gradient(circle at var(--jk-x) var(--jk-y), #000 calc(var(--jk-r) - 140px), transparent var(--jk-r));
+}
+::view-transition-old(root) { z-index: 1; }
+::view-transition-new(root) { z-index: 2; }
+
+/* ───────── arranging the home screen (ui/sortable.tsx) ───────── */
+html.jk-arranging [data-sort-item="cats"] { outline: 1px dashed var(--color-line-strong); outline-offset: 5px; }
+html.jk-arranging [data-sort-item="cats"] > :first-child, html.jk-arranging [data-sort-item^="tools:"] { cursor: grab; }
+/* a finger on the grip drags; anywhere else it still scrolls */
+[data-grip] { touch-action: none; cursor: grab; -webkit-touch-callout: none; user-select: none; }
+/* the slot the item will land in; a copy follows the pointer */
+[data-sort-item][data-hidden] { opacity: 0.45; }
+[data-sort-item][data-dragging] { opacity: 0.4; outline: 2px dashed var(--accent); outline-offset: 5px; }
+.jk-ghost { box-shadow: var(--shadow); outline: 2px solid var(--accent); outline-offset: -2px; }
+.jk-ghost, .jk-ghost * { animation: none !important; transition: none !important; }
+html.jk-dragging, html.jk-dragging * { cursor: grabbing !important; user-select: none !important; }

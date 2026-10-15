@@ -1,0 +1,2 @@
+:root[data-theme="list"] { --color-bg: #fbfaf7; --color-fg: #1b1a17; --color-line: #e3e0d8; --color-dim: #5c5a53; --color-faint: #8d8a80; --radius-2xl: 8px; }
+:root[data-theme="list"][data-mode="dark"] { --color-bg: #131210; --color-fg: #ece9e1; --color-line: #2c2a25; --color-dim: #aaa699; --color-faint: #7a776d; }

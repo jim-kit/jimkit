@@ -1,0 +1,13 @@
+# The website needs the docs and the changelog (it renders them), so unlike the root .dockerignore this one keeps the Markdown.
+**/node_modules
+**/.next
+.git
+.env
+.env.*
+!.env.example
+data
+apps/web/src/generated
+**/*.tsbuildinfo
+backups
+.jimkit-data
+apps/site/out

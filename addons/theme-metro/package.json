@@ -1,0 +1,32 @@
+{
+  "name": "@jimkit/addon-theme-metro",
+  "version": "0.1.0",
+  "description": "Solid colour tiles, square corners, no animation, and a Start-screen home that scrolls sideways.",
+  "license": "AGPL-3.0-or-later",
+  "type": "module",
+  "jimkit": {
+    "id": "theme-metro",
+    "name": "Metro theme",
+    "description": "Solid colour tiles, square corners, no animation, and a Start-screen home that scrolls sideways.",
+    "tools": [],
+    "themes": [
+      {
+        "id": "metro",
+        "name": "Metro",
+        "blurb": "Solid tiles and square corners",
+        "layout": "start",
+        "order": 30,
+        "flat": true
+      }
+    ]
+  },
+  "exports": {
+    "./client": "./src/client.ts"
+  },
+  "peerDependencies": {
+    "@jimkit/sdk": "*",
+    "@jimkit/ui": "*",
+    "lucide-react": "*",
+    "react": "^19.0.0"
+  }
+}

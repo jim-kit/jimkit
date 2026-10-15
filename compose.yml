@@ -1,0 +1,37 @@
+# Jimkit with Docker Compose. `install/install.sh` writes .env for you; to do it by hand see docs/install.md.
+#
+#   docker compose up -d --build
+#   docker compose logs -f
+#
+services:
+  jimkit:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      args:
+        # lite = browser-only tools (small); full = + ffmpeg, LibreOffice and the other conversion engines
+        VARIANT: "${JIMKIT_VARIANT:-full}"
+    # JIMKIT_IMAGE (set by `install.sh --image`) uses a prebuilt image instead of the local build
+    image: ${JIMKIT_IMAGE:-jimkit:${JIMKIT_VARIANT:-full}}
+    container_name: jimkit
+    restart: unless-stopped
+    ports:
+      # JIMKIT_BIND = which of this machine's addresses the port is published on. 127.0.0.1 when a reverse proxy on this
+      # machine is the only way in (docs/security.md); 0.0.0.0 (every network, IPv4) otherwise.
+      - "${JIMKIT_BIND:-0.0.0.0}:${JIMKIT_PORT:-3000}:3000"
+    env_file: .env
+    volumes:
+      - jimkit-data:/data
+    # the app only needs to write to /data and /tmp
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /app/apps/web/.next/cache
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    # uncomment to keep a runaway conversion from starving the host
+    # mem_limit: 4g
+    # cpus: 3
+
+volumes:
+  jimkit-data:

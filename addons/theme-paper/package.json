@@ -1,0 +1,21 @@
+{
+  "name": "@jimkit/addon-theme-paper",
+  "version": "0.1.0",
+  "description": "Warm cream and brown-black ink, thin warm lines and a serif for page titles. The look of this project's website.",
+  "license": "AGPL-3.0-or-later",
+  "type": "module",
+  "jimkit": {
+    "id": "theme-paper",
+    "name": "Paper theme",
+    "description": "Warm cream and brown-black ink, thin warm lines and a serif for page titles. The look of this project's website.",
+    "tools": [],
+    "themes": [
+      {
+        "id": "paper",
+        "name": "Paper",
+        "blurb": "Warm paper and ink",
+        "order": 10
+      }
+    ]
+  }
+}

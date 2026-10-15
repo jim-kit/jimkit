@@ -1,0 +1,9 @@
+// Cloudflare Workers Builds reads this to publish the website (apps/site). See apps/site/deploy/README.md.
+{
+  "name": "jimkit-site",
+  "compatibility_date": "2026-10-15",
+  "assets": {
+    "directory": "./apps/site/out",
+    "not_found_handling": "404-page"
+  }
+}

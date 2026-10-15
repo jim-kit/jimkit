@@ -1,0 +1,58 @@
+# The site next to a Traefik v3 proxy that already terminates TLS (Coolify's, or your own). Copy to compose.yml and set the names in .env:
+#
+#   SITE_HOSTNAME=jimkit.example.org      the address people use (the canonical one: it is what the pages, the sitemap and the cards say)
+#   ALIAS_HOSTNAME=kit.example.org        optional: a shorter name that redirects to it (leave the line out of .env to skip)
+#   PROXY_NETWORK=coolify                 the Docker network Traefik reads
+#   CERT_RESOLVER=letsencrypt             the certificate resolver Traefik has
+#
+# Build the image first (see Dockerfile), or let `docker compose up -d --build` do it from the repository root.
+services:
+  site:
+    build:
+      context: ../../..
+      dockerfile: apps/site/deploy/Dockerfile
+      args:
+        SITE_URL: https://${SITE_HOSTNAME:?set SITE_HOSTNAME in .env}
+        REPO_URL: ${REPO_URL:-https://github.com/jim-kit/jimkit}
+        GOOGLE_VERIFICATION: ${GOOGLE_VERIFICATION:-}
+        BING_VERIFICATION: ${BING_VERIFICATION:-}
+    image: jimkit-site:local
+    restart: unless-stopped
+    read_only: true
+    tmpfs: [/var/cache/nginx, /var/run, /tmp]
+    cap_drop: [ALL]
+    cap_add: [CHOWN, SETGID, SETUID, NET_BIND_SERVICE]
+    security_opt: ["no-new-privileges:true"]
+    networks: [proxy]
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=${PROXY_NETWORK:-coolify}
+      - traefik.http.services.jimkit-site.loadbalancer.server.port=80
+      - traefik.http.middlewares.jimkit-site-https.redirectscheme.scheme=https
+      - traefik.http.middlewares.jimkit-site-https.redirectscheme.permanent=true
+      - traefik.http.middlewares.jimkit-site-canonical.redirectregex.regex=^https?://${ALIAS_HOSTNAME:-alias.invalid}/(.*)
+      - traefik.http.middlewares.jimkit-site-canonical.redirectregex.replacement=https://${SITE_HOSTNAME}/$${1}
+      - traefik.http.middlewares.jimkit-site-canonical.redirectregex.permanent=true
+      # plain http goes to https
+      - traefik.http.routers.jimkit-site-http.entrypoints=http
+      - traefik.http.routers.jimkit-site-http.rule=Host(`${SITE_HOSTNAME}`) || Host(`${ALIAS_HOSTNAME:-alias.invalid}`)
+      - traefik.http.routers.jimkit-site-http.middlewares=jimkit-site-https
+      - traefik.http.routers.jimkit-site-http.service=jimkit-site
+      # the canonical name serves the site
+      - traefik.http.routers.jimkit-site.entrypoints=https
+      - traefik.http.routers.jimkit-site.rule=Host(`${SITE_HOSTNAME}`)
+      - traefik.http.routers.jimkit-site.tls=true
+      - traefik.http.routers.jimkit-site.tls.certresolver=${CERT_RESOLVER:-letsencrypt}
+      - traefik.http.routers.jimkit-site.service=jimkit-site
+      # the alias (if there is one) redirects to it, keeping the path
+      - traefik.http.routers.jimkit-site-alias.entrypoints=https
+      - traefik.http.routers.jimkit-site-alias.rule=Host(`${ALIAS_HOSTNAME:-alias.invalid}`)
+      - traefik.http.routers.jimkit-site-alias.tls=true
+      - traefik.http.routers.jimkit-site-alias.tls.certresolver=${CERT_RESOLVER:-letsencrypt}
+      - traefik.http.routers.jimkit-site-alias.middlewares=jimkit-site-canonical
+      - traefik.http.routers.jimkit-site-alias.service=jimkit-site
+
+networks:
+  proxy:
+    name: ${PROXY_NETWORK:-coolify}
+    external: true

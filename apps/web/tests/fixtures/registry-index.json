@@ -1,0 +1,64 @@
+{
+  "format": 1,
+  "kits": [
+    {
+      "repo": "ada/word-count",
+      "name": "Word count",
+      "description": "Counts words, characters and lines.",
+      "author": "Ada Lovelace",
+      "homepage": "https://example.com/word-count",
+      "tools": [
+        {
+          "name": "Word count",
+          "blurb": "Counts",
+          "icon": "PenLine"
+        }
+      ],
+      "latest": "1.1.0",
+      "versions": [
+        {
+          "version": "1.1.0",
+          "tag": "v1.1.0",
+          "sha256": "8db43415cead23aa8b9c2acec9e2f0f6d3156bab1b388b7864c1f6b51feb6601",
+          "size": 385,
+          "date": "2026-10-01T00:00:00Z",
+          "server": true,
+          "apt": [
+            "ffmpeg"
+          ]
+        },
+        {
+          "version": "1.0.0",
+          "tag": "v1.0.0",
+          "sha256": "fb98474938952fd62cd3da776f16423c93c63d767200ea3f43996b26bb448919",
+          "size": 369,
+          "date": "2026-10-01T00:00:00Z",
+          "server": false,
+          "apt": [
+            "ffmpeg"
+          ]
+        }
+      ],
+      "rating": {
+        "average": 4.5,
+        "count": 2
+      },
+      "reviews": [
+        {
+          "user": "grace",
+          "rating": 5,
+          "text": "Does one thing and does it well.",
+          "version": "1.0.0",
+          "date": ""
+        },
+        {
+          "user": "linus",
+          "rating": 4,
+          "text": "Wish it counted sentences too.",
+          "date": ""
+        }
+      ],
+      "stars": 12
+    }
+  ]
+}

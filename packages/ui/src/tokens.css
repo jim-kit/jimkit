@@ -1,0 +1,31 @@
+/* The design tokens as Tailwind theme variables. styles.css imports this; `jimkit kits pack` imports it as a reference so a kit's
+ * stylesheet can use bg-surface, text-fg, rounded-xl ... without repeating the host's CSS. */
+@theme static {
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+
+  --color-bg: #212529;
+  --color-surface: #2b3035;
+  --color-raised: #2b3035;
+  --color-raised-2: #343a40;
+  --color-line: #495057;
+  --color-line-strong: #6c757d;
+  --color-fg: #dee2e6;
+  --color-dim: #adb5bd;
+  --color-faint: #8d959c;
+  --color-tint: rgb(255 255 255 / 0.05);
+  --color-tint-2: rgb(255 255 255 / 0.1);
+  --color-field: rgb(0 0 0 / 0.22);
+  --color-accent: var(--accent);
+  --color-accent-fg: var(--accent-fg);
+  --color-ok: #75b798;
+  --color-warn: #ffda6a;
+  --color-bad: #ea868f;
+
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 6px;
+  --radius-xl: 6px;
+  --radius-2xl: 6px;
+  --radius-3xl: 8px;
+}

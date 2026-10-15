@@ -1,0 +1,24 @@
+{
+  "name": "@jimkit/sdk",
+  "version": "0.1.0",
+  "description": "Types and helpers for writing Jimkit addons.",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./server": "./src/server.ts",
+    "./react": "./src/react.tsx",
+    "./settings": "./src/settings.ts",
+    "./bundle": {
+      "types": "./src/bundle.d.mts",
+      "default": "./src/bundle.mjs"
+    },
+    "./testing": "./src/testing.ts"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  }
+}

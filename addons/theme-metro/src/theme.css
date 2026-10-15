@@ -1,0 +1,53 @@
+/* Metro theme: every rule is scoped to :root[data-theme="metro"], so it does nothing until the theme is chosen. */
+/* ───────── metro ───────── */
+:root[data-theme="metro"] {
+  --color-bg: #121212;
+  --color-surface: #1b1b1b;
+  --color-raised: #242424;
+  --color-raised-2: #2d2d2d;
+  --color-line: rgb(255 255 255 / 0.1);
+  --color-line-strong: rgb(255 255 255 / 0.26);
+  --color-fg: #ffffff;
+  --color-dim: #c9c9c9;
+  --color-faint: #8d8d8d;
+  --color-ok: #3ddc84;
+  --color-warn: #ffb300;
+  --color-bad: #ff5252;
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+  --radius-2xl: 0px;
+  --radius-3xl: 0px;
+  --dur: 0ms;
+}
+:root[data-theme="metro"] :is(.jk-round, .rounded-full) { border-radius: 0 !important; }
+:root[data-mode="light"][data-theme="metro"] {
+  --color-bg: #ffffff;
+  --color-surface: #f2f2f2;
+  --color-raised: #e9e9e9;
+  --color-raised-2: #dedede;
+  --color-line: rgb(0 0 0 / 0.12);
+  --color-line-strong: rgb(0 0 0 / 0.35);
+  --color-fg: #000000;
+  --color-dim: #3a3a3a;
+  --color-faint: #666666;
+  --color-field: #ffffff;
+  --color-ok: #0b7a3e;
+  --color-warn: #8a5a00;
+  --color-bad: #c4001a;
+}
+:root[data-theme="metro"] .jk-tile {
+  /* the accent itself, with the hue nudged a little per tool so the tiles aren't one flat colour */
+  background: var(--accent);
+  background: oklch(from var(--accent) l c calc(h + (var(--hue) - 250) * 0.15));
+  color: var(--accent-fg);
+}
+/* a colour the visitor picked for one tool is used as it is */
+:root[data-theme="metro"] .jk-tile.jk-own { background: oklch(from var(--accent) l c var(--hue)); }
+
+:root[data-mode="light"][data-theme="metro"] .jk-tile { color: var(--accent-fg); }
+:root[data-theme="metro"] .jk-spin { animation: jk-spin 0.9s steps(8) infinite; }
+/* Metro doesn't move: not even a pressed button, nor the toasts */
+:root[data-theme="metro"] :active { scale: none !important; }
+:root[data-theme="metro"] [data-sonner-toast], :root[data-theme="metro"] [data-sonner-toast] * { transition-duration: 0ms !important; animation-duration: 0ms !important; }

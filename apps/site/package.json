@@ -1,0 +1,32 @@
+{
+  "name": "@jimkit/site",
+  "version": "0.1.0",
+  "private": true,
+  "description": "The Jimkit website: a static page with the real tools running in it, the docs and the changelog.",
+  "type": "module",
+  "scripts": {
+    "dev": "next dev -H 0.0.0.0 -p 3100",
+    "build": "next build",
+    "serve": "node serve.mjs"
+  },
+  "dependencies": {
+    "@jimkit/addon-convert": "*",
+    "@jimkit/addon-devtools": "*",
+    "@jimkit/addon-hash": "*",
+    "@jimkit/addon-text": "*",
+    "@jimkit/sdk": "*",
+    "@jimkit/ui": "*",
+    "lucide-react": "^1.49.0",
+    "next": "^16.3.8",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "sonner": "^2.0.8"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "tailwindcss": "^4.3.3"
+  },
+  "license": "AGPL-3.0-or-later"
+}

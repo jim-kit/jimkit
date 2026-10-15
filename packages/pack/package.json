@@ -1,0 +1,21 @@
+{
+  "name": "@jimkit/pack",
+  "version": "0.1.0",
+  "description": "Packs a Jimkit kit into the single jimkit-kit.json file Jimkit installs from a GitHub release.",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "jimkit-pack": "./bin/jimkit-pack.mjs"
+  },
+  "exports": {
+    ".": "./src/pack.mjs"
+  },
+  "dependencies": {
+    "@jimkit/sdk": "*",
+    "@jimkit/ui": "*",
+    "@tailwindcss/postcss": "^4.3.3",
+    "esbuild": "^0.28.0",
+    "postcss": "^8.5.0",
+    "tailwindcss": "^4.3.3"
+  }
+}

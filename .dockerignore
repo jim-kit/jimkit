@@ -1,0 +1,15 @@
+**/node_modules
+**/.next
+.git
+.env
+.env.*
+!.env.example
+data
+apps/web/src/generated
+**/*.tsbuildinfo
+docs
+*.md
+!LICENSE
+backups
+.jimkit-data
+apps/site/out

@@ -1,0 +1,206 @@
+{
+  "name": "@jimkit/addon-text",
+  "version": "0.1.0",
+  "description": "A text editor with Markdown preview, a JSON/YAML formatter, a text diff and encoders.",
+  "license": "AGPL-3.0-or-later",
+  "type": "module",
+  "exports": {
+    "./client": "./src/client.ts",
+    "./markdown": "./src/lib/markdown.ts"
+  },
+  "dependencies": {
+    "yaml": "^2.8.1"
+  },
+  "peerDependencies": {
+    "@jimkit/sdk": "*",
+    "@jimkit/ui": "*",
+    "lucide-react": "*",
+    "react": "^19.0.0"
+  },
+  "jimkit": {
+    "id": "text",
+    "name": "Text & data",
+    "description": "Text editor, Markdown preview, JSON/YAML, diff, Base64 and friends.",
+    "tools": [
+      {
+        "id": "text-editor",
+        "category": "write",
+        "name": "Text editor",
+        "blurb": "Notes, Markdown with a preview, JSON and YAML, find and replace",
+        "icon": "PenLine",
+        "keywords": [
+          "code",
+          "format",
+          "json",
+          "markdown",
+          "md",
+          "note",
+          "notepad",
+          "prettify",
+          "preview",
+          "txt",
+          "validate",
+          "yaml"
+        ],
+        "aliases": {
+          "markdown": {
+            "mode": "markdown"
+          },
+          "data": {
+            "mode": "json"
+          }
+        },
+        "quick": [
+          {
+            "label": "New Markdown document",
+            "init": {
+              "mode": "markdown"
+            },
+            "keywords": [
+              "md",
+              "preview",
+              "write"
+            ]
+          },
+          {
+            "label": "New JSON document",
+            "init": {
+              "mode": "json"
+            },
+            "keywords": [
+              "format",
+              "validate",
+              "prettify"
+            ]
+          },
+          {
+            "label": "New YAML document",
+            "init": {
+              "mode": "yaml"
+            },
+            "keywords": [
+              "format",
+              "validate",
+              "config"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "diff",
+        "category": "write",
+        "name": "Text diff",
+        "blurb": "Compare two texts, word by word",
+        "icon": "GitCompare",
+        "keywords": [
+          "compare",
+          "difference"
+        ]
+      },
+      {
+        "id": "encode",
+        "category": "write",
+        "name": "Encode & decode",
+        "blurb": "Base64, URL, hex, HTML, JWT and more",
+        "icon": "Binary",
+        "keywords": [
+          "base64",
+          "url",
+          "hex",
+          "jwt",
+          "rot13"
+        ]
+      }
+    ],
+    "fileActions": [
+      {
+        "id": "open-text",
+        "tool": "text-editor",
+        "label": "Open in the text editor",
+        "icon": "PenLine",
+        "accept": {
+          "ext": [
+            "txt",
+            "md",
+            "json",
+            "yaml",
+            "yml",
+            "csv",
+            "tsv",
+            "html",
+            "htm",
+            "xml",
+            "log",
+            "ini",
+            "toml",
+            "conf",
+            "env",
+            "js",
+            "ts",
+            "tsx",
+            "jsx",
+            "py",
+            "rs",
+            "go",
+            "c",
+            "h",
+            "cpp",
+            "java",
+            "sh",
+            "css",
+            "sql",
+            "rb",
+            "php",
+            "lua",
+            "tex",
+            "srt",
+            "vtt",
+            "rst",
+            "adoc",
+            "asciidoc",
+            "org",
+            "textile",
+            "wiki",
+            "bib",
+            "diff",
+            "patch",
+            "cfg",
+            "properties",
+            "gitignore",
+            "dockerfile",
+            "mk",
+            "cmake",
+            "gradle",
+            "kt",
+            "kts",
+            "swift",
+            "cs",
+            "scala",
+            "r",
+            "pl",
+            "dart",
+            "vue",
+            "svelte",
+            "scss",
+            "less",
+            "graphql",
+            "gql",
+            "proto",
+            "ps1",
+            "bat",
+            "nfo"
+          ],
+          "mime": [
+            "text/*",
+            "application/json",
+            "application/xml",
+            "application/x-yaml",
+            "application/x-tex",
+            "application/x-sh"
+          ]
+        },
+        "priority": 20
+      }
+    ]
+  }
+}

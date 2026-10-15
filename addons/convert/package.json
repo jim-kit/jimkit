@@ -1,0 +1,111 @@
+{
+  "name": "@jimkit/addon-convert",
+  "version": "0.1.0",
+  "description": "Convert images, video, audio, documents, PDFs and data files with ffmpeg, ImageMagick, LibreOffice, pandoc and poppler. Sandboxed, queued, limit-aware.",
+  "license": "AGPL-3.0-or-later",
+  "type": "module",
+  "exports": {
+    "./client": "./src/client.ts",
+    "./server": "./src/server.ts",
+    "./edges": "./src/lib/registry/edges.ts"
+  },
+  "dependencies": {
+    "archiver": "^7.0.1",
+    "papaparse": "^5.5.3",
+    "yaml": "^2.8.1"
+  },
+  "devDependencies": {
+    "@types/archiver": "^6.0.3",
+    "@types/papaparse": "^5.3.16"
+  },
+  "peerDependencies": {
+    "@jimkit/sdk": "*",
+    "@jimkit/ui": "*",
+    "lucide-react": "*",
+    "react": "^19.0.0"
+  },
+  "jimkit": {
+    "id": "convert",
+    "name": "Converter",
+    "description": "Turns files into other files. Video, office documents and PDFs need the full image.",
+    "tools": [
+      {
+        "id": "convert",
+        "category": "convert",
+        "name": "Converter",
+        "blurb": "Pretty much any format to any other",
+        "icon": "Shuffle",
+        "keywords": [
+          "convert",
+          "transcode",
+          "heic",
+          "png",
+          "jpg",
+          "mp4",
+          "mp3",
+          "pdf",
+          "docx",
+          "csv",
+          "format"
+        ]
+      }
+    ],
+    "fileActions": [
+      {
+        "id": "convert-file",
+        "tool": "convert",
+        "label": "Convert to another format",
+        "icon": "Shuffle",
+        "accept": {
+          "ext": [
+            "*"
+          ]
+        },
+        "priority": 50
+      }
+    ],
+    "server": true,
+    "system": {
+      "apt": [
+        "ffmpeg",
+        "imagemagick",
+        "libheif1",
+        "libde265-0",
+        "libx265-199",
+        "libmagickcore-6.q16-6-extra",
+        "librsvg2-bin",
+        "poppler-utils",
+        "pandoc",
+        "libreoffice-writer",
+        "libreoffice-calc",
+        "libreoffice-impress",
+        "fonts-liberation",
+        "fonts-dejavu-core",
+        "file",
+        "unzip"
+      ]
+    },
+    "env": [
+      {
+        "name": "JIMKIT_ENGINE_THREADS",
+        "description": "Threads handed to ffmpeg and friends",
+        "default": "3"
+      },
+      {
+        "name": "JIMKIT_GLOBAL_JOBS",
+        "description": "Conversions running at once, across everyone",
+        "default": "2"
+      },
+      {
+        "name": "JIMKIT_RETENTION_HOURS",
+        "description": "How long uploads and results are kept",
+        "default": "6"
+      },
+      {
+        "name": "JIMKIT_SCRATCH_CAP_GB",
+        "description": "Hard cap on stored files",
+        "default": "30"
+      }
+    ]
+  }
+}

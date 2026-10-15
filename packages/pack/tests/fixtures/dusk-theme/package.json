@@ -1,0 +1,13 @@
+{
+  "name": "jimkit-kit-dusk",
+  "version": "1.0.0",
+  "description": "A dim, purple-grey look.",
+  "author": "Ada Lovelace",
+  "jimkit": {
+    "id": "dusk-theme",
+    "name": "Dusk",
+    "description": "A dim, purple-grey look.",
+    "tools": [],
+    "themes": [{ "id": "dusk", "name": "Dusk", "blurb": "Dim purple-grey surfaces" }]
+  }
+}

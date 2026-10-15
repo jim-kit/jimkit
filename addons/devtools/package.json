@@ -1,0 +1,191 @@
+{
+  "name": "@jimkit/addon-devtools",
+  "version": "0.1.0",
+  "description": "Small developer tools: regex tester, ID and password generators, time, colour, QR codes.",
+  "license": "AGPL-3.0-or-later",
+  "type": "module",
+  "exports": {
+    "./client": "./src/client.ts",
+    "./qr": "./src/lib/qr.ts",
+    "./cron": "./src/lib/cron.ts",
+    "./colour": "./src/lib/colour.ts"
+  },
+  "devDependencies": {
+    "jsqr": "^1.4.0"
+  },
+  "peerDependencies": {
+    "@jimkit/sdk": "*",
+    "@jimkit/ui": "*",
+    "lucide-react": "*",
+    "react": "^19.0.0"
+  },
+  "jimkit": {
+    "id": "devtools",
+    "name": "Developer tools",
+    "description": "Regex tester, ID and password generators, time, colour, QR codes and more.",
+    "categories": [
+      {
+        "id": "dev",
+        "name": "Developer",
+        "blurb": "Regex, IDs, time, colour, QR",
+        "icon": "Terminal",
+        "hue": 215
+      }
+    ],
+    "tools": [
+      {
+        "id": "regex",
+        "category": "dev",
+        "name": "Regex tester",
+        "blurb": "Test a pattern, see matches and groups",
+        "icon": "Regex",
+        "keywords": [
+          "regular expression",
+          "regexp",
+          "match",
+          "replace",
+          "capture group",
+          "pattern"
+        ]
+      },
+      {
+        "id": "generate",
+        "category": "dev",
+        "name": "Generators",
+        "blurb": "UUID, ULID, NanoID, passwords, random bytes",
+        "icon": "Dices",
+        "keywords": [
+          "uuid",
+          "guid",
+          "ulid",
+          "nanoid",
+          "password",
+          "random",
+          "token",
+          "secret",
+          "hex",
+          "base64",
+          "key",
+          "id"
+        ]
+      },
+      {
+        "id": "time",
+        "category": "dev",
+        "name": "Time",
+        "blurb": "Unix timestamps, ISO dates, time zones, differences",
+        "icon": "CalendarClock",
+        "keywords": [
+          "timestamp",
+          "unix",
+          "epoch",
+          "iso 8601",
+          "rfc 2822",
+          "timezone",
+          "utc",
+          "date",
+          "datetime",
+          "duration",
+          "difference",
+          "ago"
+        ]
+      },
+      {
+        "id": "colour",
+        "category": "dev",
+        "name": "Colour",
+        "blurb": "Hex, RGB, HSL, OKLCH, contrast checker, palette",
+        "icon": "Palette",
+        "keywords": [
+          "color",
+          "hex",
+          "rgb",
+          "hsl",
+          "oklch",
+          "contrast",
+          "wcag",
+          "accessibility",
+          "palette",
+          "shade",
+          "tint",
+          "picker"
+        ]
+      },
+      {
+        "id": "qr",
+        "category": "dev",
+        "name": "QR code",
+        "blurb": "Make a QR code for text, a link or Wi-Fi",
+        "icon": "QrCode",
+        "keywords": [
+          "qrcode",
+          "barcode",
+          "wifi",
+          "url",
+          "scan",
+          "svg",
+          "png",
+          "generate"
+        ]
+      },
+      {
+        "id": "cron",
+        "category": "dev",
+        "name": "Cron",
+        "blurb": "Explain a cron expression and list its next runs",
+        "icon": "Timer",
+        "keywords": [
+          "crontab",
+          "schedule",
+          "job",
+          "expression",
+          "every",
+          "next run",
+          "systemd",
+          "timer"
+        ]
+      },
+      {
+        "id": "numbers",
+        "category": "dev",
+        "name": "Numbers",
+        "blurb": "Base converter, byte sizes, bitwise view",
+        "icon": "Calculator",
+        "keywords": [
+          "base",
+          "binary",
+          "hex",
+          "octal",
+          "decimal",
+          "bigint",
+          "bytes",
+          "kib",
+          "mib",
+          "gigabytes",
+          "bitwise",
+          "bits",
+          "shift",
+          "two's complement"
+        ]
+      },
+      {
+        "id": "url",
+        "category": "dev",
+        "name": "URL parser",
+        "blurb": "Split a URL and edit its query string",
+        "icon": "Link2",
+        "keywords": [
+          "query string",
+          "params",
+          "parameters",
+          "querystring",
+          "host",
+          "path",
+          "encode",
+          "decode",
+          "uri"
+        ]
+      }
+    ]
+  }
+}

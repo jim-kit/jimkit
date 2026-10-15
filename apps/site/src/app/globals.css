@@ -1,0 +1,279 @@
+/* the layer list has to come before Tailwind's own, as in apps/web */
+@layer theme, base, components, kit, utilities;
+@import "tailwindcss";
+@import "@jimkit/ui/styles.css";
+/* the looks the app has as kits (Paper is this site's own, below): every rule in them is scoped to its own theme */
+@import "../../../../addons/theme-glass/src/theme.css";
+@import "../../../../addons/theme-metro/src/theme.css";
+
+/* the design system, and the tools shown in the demo, are scanned for classes */
+@source "../../../../packages/ui/src";
+@source "../../../../addons/text/src";
+@source "../../../../addons/hash/src";
+@source "../../../../addons/devtools/src";
+@source "../components";
+@source "../app";
+
+/* switching the look: the new one is revealed through a growing circle (lib/look.tsx), as in the app */
+::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+@property --jk-r { syntax: "<length>"; inherits: false; initial-value: 0px; }
+html.jk-soft-reveal::view-transition-new(root) {
+  -webkit-mask-image: radial-gradient(circle at var(--jk-x) var(--jk-y), #000 calc(var(--jk-r) - 140px), transparent var(--jk-r));
+  mask-image: radial-gradient(circle at var(--jk-x) var(--jk-y), #000 calc(var(--jk-r) - 140px), transparent var(--jk-r));
+}
+::view-transition-old(root) { z-index: 1; }
+::view-transition-new(root) { z-index: 2; }
+
+
+/* ───────── Paper: this site's own look ─────────
+ * Warm paper and ink instead of the app's grey. The accent is a custom colour (vermilion by default), so the logo, the tiles and every tool
+ * on the page take it. Colour-blocked sections (.block-*) re-declare the tokens, so everything inside them adapts on its own. */
+:root[data-theme="paper"] {
+  --radius-sm: 3px; --radius-md: 4px; --radius-lg: 6px; --radius-xl: 8px; --radius-2xl: 10px; --radius-3xl: 14px;
+  --font-display: "Fraunces", Georgia, serif;
+}
+:root[data-theme="paper"][data-mode="light"] {
+  color-scheme: light;
+  --color-bg: #efe8da; --color-surface: #f8f3e8; --color-raised: #fcf9f2; --color-raised-2: #f3ecdd;
+  --color-line: #d8cdb8; --color-line-strong: #b5a88e;
+  --color-fg: #1a1510; --color-dim: #574d3f; --color-faint: #857a69;
+  --color-tint: rgb(26 21 16 / 0.05); --color-tint-2: rgb(26 21 16 / 0.09); --color-field: #fffcf5;
+  --color-ok: #1f6b45; --color-warn: #8a5a00; --color-bad: #b3261e;
+}
+:root[data-theme="paper"][data-mode="dark"] {
+  color-scheme: dark;
+  --color-bg: #15110d; --color-surface: #1e1913; --color-raised: #241e17; --color-raised-2: #2c251c;
+  --color-line: #3a3126; --color-line-strong: #5a4d3b;
+  --color-fg: #f1e8d8; --color-dim: #bcb09a; --color-faint: #8d826f;
+  --color-tint: rgb(255 240 215 / 0.05); --color-tint-2: rgb(255 240 215 / 0.1); --color-field: rgb(0 0 0 / 0.25);
+  --color-ok: #7fc79f; --color-warn: #f0c36a; --color-bad: #f08a80;
+}
+body { background-color: var(--color-bg); }
+
+/* headlines */
+.font-display { font-family: var(--font-display), Georgia, serif; font-weight: 500; letter-spacing: -0.025em; line-height: 1.02; font-variation-settings: "SOFT" 100, "opsz" 144; }
+:root[data-theme="basic"] .font-display, :root[data-theme="glass"] .font-display { font-family: system-ui, sans-serif; font-weight: 650; letter-spacing: -0.035em; font-variation-settings: normal; }
+:root[data-theme="metro"] .font-display { font-family: "Segoe UI Light", "Segoe UI", system-ui, sans-serif; font-weight: 200; letter-spacing: -0.03em; font-variation-settings: normal; }
+.font-mono-label { font-family: var(--font-mono); font-size: 11.5px; letter-spacing: 0.06em; text-transform: uppercase; }
+
+/* colour blocks: a section with its own background. The tokens are re-declared, so text, borders and cards inside follow. */
+.block-ink { --color-bg: #1a1510; --color-surface: #251f18; --color-raised: #2b241c; --color-raised-2: #342c22; --color-line: #3d3428; --color-line-strong: #6a5b45; --color-fg: #f4ecde; --color-dim: #c9bda6; --color-faint: #9a8f7b; --color-tint: rgb(255 240 215 / 0.06); --color-tint-2: rgb(255 240 215 / 0.12); --color-field: rgb(0 0 0 / 0.3); background: var(--color-bg); color: var(--color-fg); color-scheme: dark; }
+.block-accent { --color-bg: var(--accent); --color-surface: rgb(0 0 0 / 0.1); --color-raised: rgb(0 0 0 / 0.12); --color-raised-2: rgb(0 0 0 / 0.18); --color-line: rgb(0 0 0 / 0.2); --color-line-strong: rgb(0 0 0 / 0.4); --color-fg: var(--accent-fg); --color-dim: color-mix(in srgb, var(--accent-fg) 80%, transparent); --color-faint: color-mix(in srgb, var(--accent-fg) 62%, transparent); --color-tint: rgb(0 0 0 / 0.08); --color-tint-2: rgb(0 0 0 / 0.14); --color-field: rgb(0 0 0 / 0.14); --color-accent: var(--accent-fg); --color-accent-fg: var(--accent); background: var(--accent); color: var(--accent-fg); }
+.block-lime { --color-bg: #d6f25c; --color-surface: rgb(26 21 16 / 0.07); --color-raised: rgb(26 21 16 / 0.08); --color-raised-2: rgb(26 21 16 / 0.12); --color-line: rgb(26 21 16 / 0.2); --color-line-strong: rgb(26 21 16 / 0.45); --color-fg: #1a1510; --color-dim: #3d3a1c; --color-faint: #5e5b34; --color-tint: rgb(26 21 16 / 0.07); --color-tint-2: rgb(26 21 16 / 0.13); --color-field: rgb(255 255 255 / 0.45); --color-accent: #1a1510; --color-accent-fg: #d6f25c; background: var(--color-bg); color: var(--color-fg); color-scheme: light; }
+.block-lilac { --color-bg: #cdbdff; --color-surface: rgb(26 21 16 / 0.07); --color-raised: rgb(255 255 255 / 0.35); --color-raised-2: rgb(255 255 255 / 0.5); --color-line: rgb(26 21 16 / 0.18); --color-line-strong: rgb(26 21 16 / 0.42); --color-fg: #1a1510; --color-dim: #41365f; --color-faint: #5f5480; --color-tint: rgb(26 21 16 / 0.07); --color-tint-2: rgb(26 21 16 / 0.13); --color-field: rgb(255 255 255 / 0.5); --color-accent: #1a1510; --color-accent-fg: #cdbdff; background: var(--color-bg); color: var(--color-fg); color-scheme: light; }
+.block-ink .text-accent-soft, .block-accent .text-accent-soft { color: var(--color-fg); }
+
+/* The colour bands set their own tokens whatever mode the page is in, but the Glass look picks its panel, card, tile and field rules by the
+ * page's mode. Inside a band of the other kind those rules are the wrong ones (a pale highlight over a dark panel, or the reverse), so the
+ * band gets the set that matches its own colours. */
+:root[data-mode="light"][data-theme="glass"] .block-ink .jk-panel { background-image: linear-gradient(180deg, rgb(255 255 255 / 0.055), rgb(255 255 255 / 0.012) 38%); box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.11), 0 12px 32px -18px rgb(0 0 0 / 0.65); }
+:root[data-mode="light"][data-theme="glass"] .block-ink .jk-panel .jk-panel { background-image: none; box-shadow: none; }
+:root[data-mode="light"][data-theme="glass"] .block-ink .jk-card { background-image: linear-gradient(180deg, rgb(255 255 255 / 0.05), transparent 70%); box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.07); }
+:root[data-mode="light"][data-theme="glass"] .block-ink .bg-field { box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.3); }
+:root[data-mode="light"][data-theme="glass"] .block-ink .jk-tile { background: linear-gradient(150deg, oklch(0.47 0.1 var(--hue) / 0.72), oklch(0.32 0.065 var(--hue) / 0.5)); color: oklch(0.9 0.09 var(--hue)); box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.2), 0 0 0 1px oklch(0.62 0.1 var(--hue) / 0.3); }
+:root[data-mode="dark"][data-theme="glass"] :is(.block-lime, .block-sun) .jk-panel { background-image: linear-gradient(180deg, rgb(255 255 255 / 0.6), rgb(255 255 255 / 0.1) 45%); box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.9), 0 12px 30px -20px rgb(30 45 100 / 0.3); }
+:root[data-mode="dark"][data-theme="glass"] :is(.block-lime, .block-sun) .jk-panel .jk-panel { background-image: none; box-shadow: none; }
+:root[data-mode="dark"][data-theme="glass"] :is(.block-lime, .block-sun) .jk-card { background-image: linear-gradient(180deg, rgb(255 255 255 / 0.55), transparent 75%); box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.85); }
+:root[data-mode="dark"][data-theme="glass"] :is(.block-lime, .block-sun) .bg-field { box-shadow: inset 0 1px 2px rgb(30 45 100 / 0.12); }
+:root[data-mode="dark"][data-theme="glass"] :is(.block-lime, .block-sun) .jk-tile { background: oklch(0.93 0.05 var(--hue) / 0.9); color: oklch(0.38 0.12 var(--hue)); box-shadow: 0 0 0 1px oklch(0.6 0.1 var(--hue) / 0.2); }
+
+/* the accent, lifted in lightness, for text that has to stand out */
+.text-accent-soft { color: var(--color-accent); }
+
+.site-grid, .site-glow { display: none; }
+html { scroll-behavior: smooth; scroll-padding-top: 56px; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+/* ───────── the page ───────── */
+
+
+/* the accent, lifted in lightness: for text that has to stand out on a dark background (the logo uses the same trick) */
+.text-accent-soft { color: var(--color-accent); }
+@supports (color: oklch(from red l c h)) {
+  .text-accent-soft { color: oklch(from var(--color-accent) calc(l + 0.1) c h); }
+  :root[data-mode="light"] .text-accent-soft { color: oklch(from var(--color-accent) calc(l - 0.03) c h); }
+}
+
+
+/* the narrow pill in Metro is square like everything else */
+:root[data-theme="metro"] .rounded-full { border-radius: 0; }
+
+/* ───────── rendered Markdown (docs and changelog) ───────── */
+.doc { font-size: 15.5px; line-height: 1.75; color: var(--color-dim); }
+.doc > :first-child { margin-top: 0; }
+.doc h2 { margin: 2.6em 0 0.7em; font-size: 1.55rem; line-height: 1.25; font-weight: 600; letter-spacing: -0.015em; color: var(--color-fg); scroll-margin-top: 84px; }
+.doc h3 { margin: 2em 0 0.5em; font-size: 1.15rem; font-weight: 600; color: var(--color-fg); scroll-margin-top: 84px; }
+.doc h4 { margin: 1.6em 0 0.4em; font-weight: 600; color: var(--color-fg); }
+.doc p { margin: 0.9em 0; }
+.doc a { color: var(--color-accent); text-decoration: underline; text-decoration-color: rgb(var(--accent-rgb) / 0.4); text-underline-offset: 3px; }
+.doc a:hover { text-decoration-color: currentColor; }
+.doc strong { color: var(--color-fg); font-weight: 600; }
+.doc ul, .doc ol { margin: 0.9em 0; padding-left: 1.4em; }
+.doc ul { list-style: disc; } .doc ol { list-style: decimal; }
+.doc li { margin: 0.35em 0; } .doc li::marker { color: var(--color-faint); }
+.doc li.task { list-style: none; margin-left: -1.2em; }
+.doc code { padding: 0.12em 0.4em; border-radius: 5px; background: var(--color-tint-2); font-family: var(--font-mono); font-size: 0.86em; color: var(--color-fg); }
+.doc .doc-code { position: relative; margin: 1.2em 0; border: 1px solid var(--color-line); border-radius: 12px; background: var(--color-field); }
+.doc .doc-code pre { margin: 0; overflow-x: auto; padding: 1.05em 1.2em; font-size: 13.5px; line-height: 1.7; }
+.doc .doc-code code { padding: 0; background: none; font-size: inherit; color: var(--color-fg); }
+.doc .doc-code button { position: absolute; right: 8px; top: 8px; padding: 3px 9px; border-radius: 7px; border: 1px solid var(--color-line-strong); background: var(--color-surface); color: var(--color-dim); font-size: 12px; opacity: 0; transition: opacity var(--dur); }
+.doc .doc-code:hover button, .doc .doc-code button:focus-visible { opacity: 1; }
+@media (hover: none) { .doc .doc-code button { opacity: 1; } }
+.doc .doc-table { margin: 1.2em 0; overflow-x: auto; border: 1px solid var(--color-line); border-radius: 12px; }
+.doc table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.doc th, .doc td { padding: 0.65em 0.95em; text-align: left; vertical-align: top; border-bottom: 1px solid var(--color-line); }
+.doc th { font-weight: 600; color: var(--color-fg); background: var(--color-tint); white-space: nowrap; }
+.doc tr:last-child td { border-bottom: 0; }
+.doc blockquote { margin: 1.2em 0; padding: 0.2em 1.1em; border-left: 3px solid var(--color-accent); color: var(--color-dim); }
+.doc hr { margin: 2.4em 0; border: 0; border-top: 1px solid var(--color-line); }
+:root[data-theme="metro"] .doc .doc-code, :root[data-theme="metro"] .doc .doc-table { border-radius: 0; }
+
+/* ───────── the cube ───────── */
+.cube { overflow: visible; touch-action: manipulation; }
+.cube-lean { transform: translate(calc(var(--px) * var(--z) * -34px), calc(var(--py) * var(--z) * -34px)); transition: transform 0.35s var(--ease); }
+.cube-face { transform-box: fill-box; transform-origin: center; transition: transform 1100ms cubic-bezier(0.22, 1, 0.36, 1) calc(var(--i) * 34ms), opacity 600ms ease-out calc(var(--i) * 34ms); }
+.cube[data-state="waiting"] .cube-face, .cube[data-state="apart"] .cube-face { transform: translate(var(--sx), var(--sy)) rotate(var(--sr)) scale(0.5); opacity: 0; }
+.cube[data-state="apart"] .cube-face { transition-delay: calc(var(--i) * 8ms); }
+.cube-t0 { fill: oklch(from var(--color-accent) calc(l + 0.24) c h); stroke: oklch(from var(--color-accent) calc(l + 0.24) c h); }
+.cube-t1 { fill: oklch(from var(--color-accent) calc(l + 0.15) c h); stroke: oklch(from var(--color-accent) calc(l + 0.15) c h); }
+.cube-t2 { fill: oklch(from var(--color-accent) calc(l + 0.07) c h); stroke: oklch(from var(--color-accent) calc(l + 0.07) c h); }
+.cube-t3 { fill: var(--color-accent); stroke: var(--color-accent); }
+:root[data-mode="light"] .cube-t0 { fill: oklch(from var(--color-accent) calc(l + 0.14) c h); stroke: oklch(from var(--color-accent) calc(l + 0.14) c h); }
+:root[data-mode="light"] .cube-t1 { fill: oklch(from var(--color-accent) calc(l + 0.08) c h); stroke: oklch(from var(--color-accent) calc(l + 0.08) c h); }
+:root[data-mode="light"] .cube-t2 { fill: oklch(from var(--color-accent) calc(l + 0.03) c h); stroke: oklch(from var(--color-accent) calc(l + 0.03) c h); }
+:root[data-mode="light"] .cube-t3 { fill: oklch(from var(--color-accent) calc(l - 0.04) c h); stroke: oklch(from var(--color-accent) calc(l - 0.04) c h); }
+@media (prefers-reduced-motion: reduce) { .cube-lean, .cube-face { transition: none; } .cube[data-state="waiting"] .cube-face { transform: none; opacity: 1; } }
+
+/* ───────── the playground's tiles ───────── */
+.jk-tile-play { transition: box-shadow var(--dur) var(--ease); user-select: none; }
+.jk-tile-play[data-mark="before"] { box-shadow: -4px 0 0 0 var(--color-accent); }
+.jk-tile-play[data-mark="after"] { box-shadow: 4px 0 0 0 var(--color-accent); }
+.jk-tile-play:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 3px; }
+
+/* ───────── the bento cells ───────── */
+.bento-cell { --mx: 50%; --my: 0%; }
+.bento-cell::before { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity 0.4s; background: radial-gradient(260px circle at var(--mx) var(--my), color-mix(in oklab, var(--color-fg) 7%, transparent), transparent 70%); }
+.bento-cell:hover::before { opacity: 1; }
+:root[data-theme="metro"] .bento-cell::before { display: none; }
+.qr-scan { top: 0; animation: qr-scan 2.6s ease-in-out infinite alternate; }
+@keyframes qr-scan { to { top: calc(100% - 2px); } }
+.tier-ring { animation: tier-pulse 4.4s ease-in-out infinite; }
+@keyframes tier-pulse { 0%, 100% { border-color: var(--color-line-strong); } 50% { border-color: var(--color-accent); } }
+.phone-float { animation: phone-float 6s ease-in-out infinite; }
+@keyframes phone-float { 50% { transform: translateY(-7px); } }
+@media (prefers-reduced-motion: reduce) { .qr-scan, .tier-ring, .phone-float { animation: none; } }
+
+/* ───────── decoration ───────── */
+.marquee { animation: marquee 48s linear infinite; }
+.marquee:hover { animation-play-state: paused; }
+@keyframes marquee { to { transform: translateX(-50%); } }
+.badge { color: var(--color-dim); }
+.badge-turn { transform-origin: 100px 100px; animation: badge-turn 40s linear infinite; }
+@keyframes badge-turn { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .marquee, .badge-turn { animation: none; } }
+
+/* film grain over the page: a few percent of noise, enough to take the flatness off the dark themes. Not in Metro. */
+body::after {
+  content: ""; position: fixed; inset: 0; z-index: 100; pointer-events: none; opacity: 0.05; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 1.2 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+:root[data-theme="metro"] body::after { display: none; }
+
+/* orbiting tool tiles around the cube */
+.orbit-tile { animation: orbit-bob 7s ease-in-out infinite; }
+@keyframes orbit-bob { 50% { transform: translateY(-9px) rotate(2deg); } }
+@media (prefers-reduced-motion: reduce) { .orbit-tile { animation: none; } }
+
+
+/* the poster cube: cream and ink on a block of the accent colour */
+/* on the sun: white and a pale tint of the accent, then two deep shades of the same hue (any accent, so never muddy) */
+/* The poster cube is one colour in a narrow range of shades. Mid-tone discs get the inverse of the page (ink on a light page, cream on a dark one);
+   a light disc (a pale accent, or black's cream twin) always gets ink and a dark disc (black on a light page) always gets cream, because the
+   cube has to be seen against the disc first. --pc is 1 on a dark page; k runs from 0 (ink) to 1 (cream). */
+:root { --pc: 0; }
+:root[data-mode="dark"] { --pc: 1; }
+:root:root .cube--poster .cube-t0 { fill: oklch(from var(--accent) calc(0.4 + 0.58 * clamp(0, calc(var(--pc, 0) * (1 - clamp(0, calc((l - 0.78) * 30), 1)) + clamp(0, calc((0.45 - l) * 30), 1)), 1)) 0.018 h); stroke: oklch(from var(--accent) calc(0.4 + 0.58 * clamp(0, calc(var(--pc, 0) * (1 - clamp(0, calc((l - 0.78) * 30), 1)) + clamp(0, calc((0.45 - l) * 30), 1)), 1)) 0.018 h); }
+:root:root .cube--poster .cube-t1 { fill: oklch(from var(--accent) calc(0.32 + 0.61 * clamp(0, calc(var(--pc, 0) * (1 - clamp(0, calc((l - 0.78) * 30), 1)) + clamp(0, calc((0.45 - l) * 30), 1)), 1)) 0.018 h); stroke: oklch(from var(--accent) calc(0.32 + 0.61 * clamp(0, calc(var(--pc, 0) * (1 - clamp(0, calc((l - 0.78) * 30), 1)) + clamp(0, calc((0.45 - l) * 30), 1)), 1)) 0.018 h); }
+:root:root .cube--poster .cube-t2 { fill: oklch(from var(--accent) calc(0.25 + 0.62 * clamp(0, calc(var(--pc, 0) * (1 - clamp(0, calc((l - 0.78) * 30), 1)) + clamp(0, calc((0.45 - l) * 30), 1)), 1)) 0.018 h); stroke: oklch(from var(--accent) calc(0.25 + 0.62 * clamp(0, calc(var(--pc, 0) * (1 - clamp(0, calc((l - 0.78) * 30), 1)) + clamp(0, calc((0.45 - l) * 30), 1)), 1)) 0.018 h); }
+:root:root .cube--poster .cube-t3 { fill: oklch(from var(--accent) calc(0.18 + 0.62 * clamp(0, calc(var(--pc, 0) * (1 - clamp(0, calc((l - 0.78) * 30), 1)) + clamp(0, calc((0.45 - l) * 30), 1)), 1)) 0.018 h); stroke: oklch(from var(--accent) calc(0.18 + 0.62 * clamp(0, calc(var(--pc, 0) * (1 - clamp(0, calc((l - 0.78) * 30), 1)) + clamp(0, calc((0.45 - l) * 30), 1)), 1)) 0.018 h); }
+
+/* the footer's wordmark: huge, outlined, cropped by the bottom of the page */
+.wordmark { font-size: clamp(7rem, 27vw, 25rem); line-height: 0.8; padding-top: 0.04em; color: transparent; -webkit-text-stroke: 1.5px var(--color-line-strong); height: 0.62em; transition: color 0.6s var(--ease); }
+.wordmark:hover { color: rgb(var(--accent-rgb) / 0.2); }
+:root[data-theme="metro"] .wordmark { -webkit-text-stroke: 0; color: var(--color-tint-2); }
+details.faq > summary { transition: color 0.2s; }
+details.faq[open] > summary { color: var(--color-fg); }
+details.faq > summary:hover .font-display { color: var(--color-accent); }
+
+/* ───────── the sun: a gradient made from the accent ─────────
+ * Lighter and turned one way in hue, the accent, then darker and turned the other way. For orange that is yellow to a deep red; for any other
+ * accent it is the neighbouring colours in OKLCH, so there is always a gradient that belongs to it. */
+:root {
+  --sun-1: #ffd23f; --sun-2: #ff9b1f; --sun-3: #f0561d; --sun-4: #b92a14;
+}
+@supports (color: oklch(from red l c h)) {
+  :root {
+    --sun-1: oklch(from var(--accent) calc(l + 0.16) c calc(h + 58));
+    --sun-2: oklch(from var(--accent) calc(l + 0.06) c calc(h + 24));
+    --sun-3: var(--accent);
+    --sun-4: oklch(from var(--accent) calc(l - 0.13) c calc(h - 16));
+  }
+}
+:root { --sun: linear-gradient(90deg, var(--sun-1) 0%, var(--sun-2) 36%, var(--sun-3) 70%, var(--sun-4) 100%); }
+.sun-bar { background: var(--sun); clip-path: inset(0 calc((1 - var(--p, 0)) * 100%) 0 0); }
+.sun-disc { border-radius: 50%; background: radial-gradient(circle at 50% 56%, var(--sun-4) 0%, var(--sun-3) 32%, var(--sun-2) 64%, var(--sun-1) 100%); box-shadow: 0 40px 90px -30px rgb(var(--accent-rgb) / 0.55); }
+.block-sun { --color-bg: var(--sun-2); --color-surface: rgb(26 21 16 / 0.08); --color-raised: rgb(26 21 16 / 0.08); --color-raised-2: rgb(26 21 16 / 0.12); --color-line: rgb(26 21 16 / 0.22); --color-line-strong: rgb(26 21 16 / 0.5); --color-fg: #1a1510; --color-dim: #3d2a12; --color-faint: #5e4220; --color-tint: rgb(26 21 16 / 0.08); --color-tint-2: rgb(26 21 16 / 0.14); background: linear-gradient(115deg, var(--sun-1) 0%, var(--sun-2) 40%, var(--sun-3) 76%, var(--sun-4) 100%); color: #1a1510; color-scheme: light; }
+.block-sun .rounded-lg:not([class*="bg-["]) { border-color: rgb(26 21 16 / 0.5); }
+.sun-btn { background: #1a1510; color: #f4ecde; }
+/* the band takes its text colour from its own lightness: a dark accent (black, deep red) gives a dark gradient, and dark text on it can't be read */
+@supports (color: oklch(from red l c h)) {
+  .block-sun {
+    --color-fg: oklch(from var(--sun-2) clamp(0.14, calc((0.66 - l) * 100), 0.96) 0.015 70);
+    --color-dim: color-mix(in oklab, var(--color-fg) 82%, transparent);
+    --color-faint: color-mix(in oklab, var(--color-fg) 62%, transparent);
+    --color-line: color-mix(in oklab, var(--color-fg) 22%, transparent);
+    --color-line-strong: color-mix(in oklab, var(--color-fg) 50%, transparent);
+    --color-surface: color-mix(in oklab, var(--color-fg) 8%, transparent);
+    --color-raised: color-mix(in oklab, var(--color-fg) 8%, transparent);
+    --color-raised-2: color-mix(in oklab, var(--color-fg) 12%, transparent);
+    --color-tint: color-mix(in oklab, var(--color-fg) 8%, transparent);
+    --color-tint-2: color-mix(in oklab, var(--color-fg) 14%, transparent);
+    color: var(--color-fg);
+  }
+  .block-sun .rounded-lg:not([class*="bg-["]) { border-color: var(--color-line-strong); }
+  .block-sun .sun-btn { background: var(--color-fg); color: oklch(from var(--color-fg) calc(1.1 - l) 0.01 70); }
+}
+
+
+/* prose keeps a comfortable line; code, tables and headings use the whole column */
+.doc > p, .doc > ul, .doc > ol, .doc > blockquote { max-width: 112ch; }
+
+/* the site's reveal: its own timing, so it plays in Metro too (the app's Metro look sets --dur to zero) */
+@keyframes site-rise { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+.site-rise { animation: site-rise 700ms cubic-bezier(0.22, 1, 0.36, 1) backwards; }
+@media (prefers-reduced-motion: reduce) { .site-rise { animation: none; } }
+
+/* ───────── chapter 04: the conversions that cover the screen ───────── */
+.cloud { height: 330vh; }
+.cv {
+  --e: clamp(0, calc((var(--p) - var(--t)) * 11), 1);
+  position: absolute; translate: -50% -50%; white-space: nowrap; font-family: var(--font-mono); line-height: 1; border-radius: 8px;
+  transform: translate(calc((1 - var(--e)) * var(--dx)), calc((1 - var(--e)) * var(--dy))) rotate(calc(var(--r) + (1 - var(--e)) * 140deg)) scale(calc(0.4 + 0.6 * var(--e)));
+  opacity: var(--e); will-change: transform, opacity;
+}
+.cv-s0 { font-size: 13px; padding: 8px 11px; }
+.cv-s1 { font-size: 18px; padding: 10px 14px; }
+.cv-s2 { font-family: var(--font-display); font-size: clamp(26px, 3.4vw, 46px); padding: 8px 18px; border-radius: 12px; }
+.cv-0 { border: 1px solid rgb(0 0 0 / 0.5); color: var(--color-fg); }
+.cv-1 { background: #1a1510; color: #f4ecde; }
+.cv-2 { background: rgb(255 255 255 / 0.9); color: #1a1510; }
+.cloud-plate { background: var(--accent); box-shadow: 0 0 0 1px rgb(0 0 0 / 0.18), 0 30px 80px -20px rgb(0 0 0 / 0.55); }
+:root[data-theme="metro"] .cv, :root[data-theme="metro"] .cloud-plate { border-radius: 0; }
+@media (max-width: 767px) { .cv-extra { display: none; } .cv-s2 { font-size: 22px; } .cloud { height: 300vh; } }
+@media (prefers-reduced-motion: reduce) { .cloud { height: auto; } .cloud-stick { position: relative; height: auto; min-height: 100vh; } }
+
+/* content that changes with a tab (components/Swap.tsx) */
+.swap-box { overflow: hidden; transition: height 380ms cubic-bezier(0.22, 1, 0.36, 1); }
+@keyframes swap-in { from { opacity: 0; transform: translateX(calc(var(--dir, 1) * 36px)); } to { opacity: 1; transform: none; } }
+.swap-in { animation: swap-in 420ms cubic-bezier(0.22, 1, 0.36, 1) backwards; }
+@media (prefers-reduced-motion: reduce) { .swap-box { transition: none; } .swap-in { animation: none; } }

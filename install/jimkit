@@ -1,0 +1,252 @@
+#!/usr/bin/env bash
+# jimkit: look after a Docker install of Jimkit. Run it from anywhere; it finds its own checkout.
+#
+#   jimkit update [--check] [--yes]   see what changed, then update: builds first (the old version keeps serving),
+#                                     swaps the container, waits until it is healthy, and goes back if it is not
+#   jimkit status                     version, container state, health and address
+#   jimkit version                    the version of this checkout
+#   jimkit logs [args]                docker compose logs (default: follow the last 100 lines)
+#   jimkit restart                    restart the container
+#   jimkit delete [--data] [--files]  take Jimkit off this machine. Alone it removes the container, the image and the `jimkit` command and
+#                                     keeps your data and the folder; --data also deletes the data volume, --files the folder (.env too),
+#                                     --all both. Shows the plan first and asks (--yes skips the question, --dry-run only shows the plan)
+#
+# `jimkit update --check` changes nothing: it exits 0 when you are up to date, 10 when there is an update, 2 when it could not tell.
+# With --data or --files, .env and your settings are first copied to ~/jimkit-removed-<date> (--no-backup skips that).
+# On Proxmox: pct exec <id> -- /opt/jimkit/install/jimkit update   (to remove the whole container: pct stop <id>; pct destroy <id>)
+set -euo pipefail
+
+say()  { printf '\033[1;34m==>\033[0m %s\n' "$*"; }
+warn() { printf '\033[1;33m!!\033[0m  %s\n' "$*" >&2; }
+die()  { printf '\033[1;31mxx\033[0m  %s\n' "$*" >&2; exit "${2:-1}"; }
+
+SELF="$(readlink -f "${BASH_SOURCE[0]}")"
+ROOT="$(cd "$(dirname "$SELF")/.." && pwd)"
+cd "$ROOT"
+[ -f compose.yml ] && [ -f package.json ] || die "$ROOT does not look like a Jimkit checkout."
+COMPOSE=(docker compose)
+
+json_version() { sed -n 's/^[[:space:]]*"version":[[:space:]]*"\([^"]*\)".*/\1/p' | head -1; }
+local_version() { json_version < package.json; }
+short_commit() { git rev-parse --short HEAD 2>/dev/null || echo "no git"; }
+env_get() { [ -f .env ] && sed -n "s/^$1=//p" .env | tail -1 | tr -d "'\"" || true; }
+running() { [ -n "$("${COMPOSE[@]}" ps --status running --quiet jimkit 2>/dev/null)" ]; }
+# asks the app itself from inside the container: no curl on the host, and the port may be bound to a single address
+healthy() { "${COMPOSE[@]}" exec -T jimkit node -e "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))" >/dev/null 2>&1; }
+wait_healthy() { # wait_healthy SECONDS
+  local i
+  for ((i = 0; i < ${1:-120}; i += 2)); do
+    if running && healthy; then return 0; fi
+    sleep 2
+  done
+  return 1
+}
+have_tty() { (: < /dev/tty) 2>/dev/null; }
+need_docker() { docker info >/dev/null 2>&1 && docker compose version >/dev/null 2>&1 || die "Docker with the Compose plugin is needed here, and this user must be able to use it."; }
+
+cmd_version() { echo "Jimkit $(local_version) ($(short_commit))"; }
+
+cmd_status() {
+  need_docker
+  cmd_version
+  if running; then
+    local state="running, not answering yet"; healthy && state="running, healthy"
+    echo "  container  $state"
+  else
+    echo "  container  not running (start it with: docker compose up -d)"
+  fi
+  local port bind
+  port="$(env_get JIMKIT_PORT)"; bind="$(env_get JIMKIT_BIND)"
+  case "${bind:-0.0.0.0}" in 0.0.0.0) echo "  address    http://localhost:${port:-3000}  (and this machine's own address on your network)" ;; *) echo "  address    http://${bind}:${port:-3000}" ;; esac
+}
+
+cmd_logs() { need_docker; if [ $# -eq 0 ]; then set -- -f --tail 100; fi; exec "${COMPOSE[@]}" logs "$@" jimkit; }
+cmd_restart() { need_docker; "${COMPOSE[@]}" restart jimkit; wait_healthy 90 && say "Restarted, and healthy." || die "Restarted, but it is not answering. See: jimkit logs"; }
+
+cmd_update() {
+  local CHECK=0 YES=0
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --check) CHECK=1 ;;
+      --yes|-y) YES=1 ;;
+      *) die "unknown option: $1 (try: jimkit update --check, jimkit update --yes)" ;;
+    esac
+    shift
+  done
+  [ "$CHECK" -eq 1 ] || need_docker
+
+  local before_version before_commit
+  before_version="$(local_version)"
+
+  # an install from a prebuilt image has no source to compare: the registry is the source
+  if [ -n "$(env_get JIMKIT_IMAGE)" ]; then
+    local image; image="$(env_get JIMKIT_IMAGE)"
+    [ "$CHECK" -eq 0 ] || { say "This install runs the prebuilt image $image. \`jimkit update\` pulls it again."; exit 0; }
+    say "Pulling $image"; "${COMPOSE[@]}" pull jimkit
+    say "Restarting"; "${COMPOSE[@]}" up -d --no-build
+    wait_healthy 120 && say "Updated, and healthy." || die "The new image is not answering. See: jimkit logs"
+    return 0
+  fi
+
+  [ -d .git ] || die "This folder is not a git checkout, so there is nothing to compare it with. Clone Jimkit again (or update the folder you copied it from) and run the installer in it." 2
+  git fetch --quiet origin 2>/dev/null || die "Could not reach the repository (git fetch failed). Check the network and the remote: git remote -v" 2
+  local up behind ahead
+  up="$(git rev-parse --abbrev-ref --symbolic-full-name '@{u}' 2>/dev/null || true)"
+  [ -n "$up" ] || die "The current branch does not track a remote branch, so there is nothing to update from. Try: git branch --set-upstream-to=origin/main" 2
+  read -r behind ahead < <(git rev-list --left-right --count "$up...HEAD")
+
+  if [ "$behind" -eq 0 ]; then
+    say "Up to date: Jimkit $before_version ($(short_commit))."
+    [ "$ahead" -eq 0 ] || warn "This checkout is $ahead commit(s) ahead of $up."
+    exit 0
+  fi
+  local after_version; after_version="$(git show "$up:package.json" 2>/dev/null | json_version)"
+  say "Update available: Jimkit ${before_version} to ${after_version:-?}  ($behind change$([ "$behind" -eq 1 ] || echo s))"
+  { git log --no-merges --format='      %s' "HEAD..$up" | head -15; } || true
+  [ "$behind" -le 15 ] || echo "      ... and $((behind - 15)) more"
+  [ "$CHECK" -eq 0 ] || exit 10
+
+  git diff --quiet HEAD -- 2>/dev/null || warn "This checkout has local changes. The update goes ahead only if they do not clash with the new code."
+  if [ "$YES" -eq 0 ] && have_tty; then
+    local a=""
+    read -r -p "Update now? It builds first, so Jimkit keeps serving until the new version is ready. [Y/n] " a < /dev/tty || true
+    case "${a:-y}" in y|Y|yes) ;; *) say "Nothing changed."; exit 0 ;; esac
+  fi
+
+  local started; started="$(date +%s)"
+  before_commit="$(git rev-parse HEAD)"
+
+  # settings first: .env holds the secrets, and the config file in the data volume holds the preferences
+  local b="$ROOT/backups/$(date +%Y%m%d-%H%M%S)"
+  mkdir -p "$b"; chmod 700 "$ROOT/backups" "$b"
+  [ ! -f .env ] || cp -p .env "$b/env"
+  # (docker cp works on a stopped container too; a missing file just means nothing was ever changed in Settings)
+  "${COMPOSE[@]}" cp jimkit:/data/jimkit.config.json "$b/jimkit.config.json" >/dev/null 2>&1 || true
+  say "Saved .env$([ -f "$b/jimkit.config.json" ] && echo " and your settings") to ${b#"$ROOT"/}"
+
+  git merge --quiet --ff-only "$up" || die "Could not fast-forward to $up. This checkout has commits or changes of its own that need sorting out first: git status"
+  # from here the checkout is on the new commit: whatever fails before it is running, put the old one back, so "Up to date" is never a lie
+  local back="git reset --quiet --keep $before_commit"
+  say "Building Jimkit $(local_version). The running container keeps serving while this happens."
+  "${COMPOSE[@]}" build || { $back; die "The build failed, so nothing changed: Jimkit $before_version is still running. (The checkout is back on $(git rev-parse --short "$before_commit").)" 1; }
+  say "Swapping the container"
+  "${COMPOSE[@]}" up -d --no-build || { $back; "${COMPOSE[@]}" up -d --no-build >/dev/null 2>&1 || true; die "Could not start the new container (is its port taken?). The checkout is back on $(git rev-parse --short "$before_commit"); see: jimkit logs" 1; }
+  if wait_healthy 120; then
+    say "Updated: Jimkit $before_version to $(local_version) in $(( $(date +%s) - started ))s, and it is healthy."
+    echo "    Old images use disk space: docker image prune"
+    return 0
+  fi
+
+  warn "The new version is not answering. Its last log lines:"
+  "${COMPOSE[@]}" logs --tail 20 jimkit >&2 || true
+  warn "Going back to Jimkit $before_version ($(git rev-parse --short "$before_commit"))."
+  git reset --quiet --keep "$before_commit"
+  "${COMPOSE[@]}" build --quiet
+  "${COMPOSE[@]}" up -d --no-build
+  if wait_healthy 120; then die "The update failed and Jimkit is running $before_version again. Your settings were saved in ${b#"$ROOT"/}. Look at: jimkit logs" 1; fi
+  die "The update failed and going back failed too. Your settings are in ${b#"$ROOT"/}. Look at: jimkit logs" 1
+}
+
+cmd_delete() {
+  local DATA=0 FILES=0 YES=0 DRY=0 BACKUP=1 FORCE=0
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --data) DATA=1 ;;
+      --files) FILES=1 ;;
+      --all) DATA=1; FILES=1 ;;
+      --yes|-y) YES=1 ;;
+      --dry-run) DRY=1 ;;
+      --no-backup) BACKUP=0 ;;
+      --force) FORCE=1 ;;
+      *) die "unknown option: $1 (try: jimkit help)" ;;
+    esac
+    shift
+  done
+  need_docker
+  if [ "$FILES" -eq 1 ]; then
+    case "$ROOT" in /|"$HOME"|"$HOME"/) die "Refusing to delete $ROOT." ;; esac
+    case "$HOME/" in "$ROOT"/*) die "Refusing to delete $ROOT: your home folder is inside it." ;; esac
+    [ -f "$ROOT/install/jimkit" ] || die "$ROOT does not look like a Jimkit folder, so it will not be deleted."
+    # a folder you develop in holds work that exists nowhere else: changes, or commits nobody has pushed
+    if [ "$FORCE" -eq 0 ] && [ -d "$ROOT/.git" ]; then
+      local dirty ahead
+      dirty="$(git -C "$ROOT" status --porcelain 2>/dev/null | head -3)"
+      ahead="$(git -C "$ROOT" rev-list --count '@{u}..HEAD' 2>/dev/null || echo "?")"
+      if [ -n "$dirty" ] || [ "$ahead" != "0" ]; then
+        die "$ROOT is a git checkout with work in it ($([ -n "$dirty" ] && echo "uncommitted changes")$([ -n "$dirty" ] && [ "$ahead" != "0" ] && echo " and ")$([ "$ahead" != "0" ] && echo "commits that are not on the remote, or no remote to compare with")). Deleting the folder would lose it. Commit and push first, or add --force."
+      fi
+    fi
+  fi
+
+  local images links=() d
+  images="$("${COMPOSE[@]}" config --images 2>/dev/null | sort -u | tr '\n' ' ' || true)"
+  for d in /usr/local/bin "$HOME/.local/bin"; do
+    if [ -L "$d/jimkit" ] && [ "$(readlink -f "$d/jimkit")" = "$SELF" ]; then links+=("$d/jimkit"); fi
+  done
+
+  say "This will remove Jimkit from this machine:"
+  echo "    - stop and remove the container"
+  [ -z "${images// }" ] || echo "    - remove the image: ${images% }"
+  [ "${#links[@]}" -eq 0 ] || echo "    - remove the command: ${links[*]}"
+  [ "$DATA" -eq 0 ] || echo "    - DELETE THE DATA VOLUME (uploads, results and the settings file jimkit.config.json)"
+  [ "$FILES" -eq 0 ] || echo "    - DELETE THE FOLDER $ROOT (with .env and backups/)"
+  [ "$DATA" -eq 1 ] || echo "    kept: the data volume (to remove it too: jimkit delete --data)"
+  [ "$FILES" -eq 1 ] || echo "    kept: the folder $ROOT (to remove it too: jimkit delete --files)"
+  if [ "$((DATA + FILES))" -gt 0 ]; then
+    [ "$BACKUP" -eq 0 ] && echo "    no backup (--no-backup)" || echo "    first: .env and your settings are copied to ~/jimkit-removed-<date>"
+  fi
+  [ "$DRY" -eq 0 ] || { say "Dry run: nothing was changed."; return 0; }
+
+  if [ "$YES" -eq 0 ]; then
+    have_tty || die "Not at a terminal, so I cannot ask. Add --yes to go ahead."
+    local a=""
+    if [ "$((DATA + FILES))" -gt 0 ]; then
+      read -r -p "Type delete to continue: " a < /dev/tty || true
+      [ "$a" = "delete" ] || { say "Nothing changed."; return 0; }
+    else
+      read -r -p "Continue? [y/N] " a < /dev/tty || true
+      case "$a" in y|Y|yes) ;; *) say "Nothing changed."; return 0 ;; esac
+    fi
+  fi
+
+  if [ "$((DATA + FILES))" -gt 0 ] && [ "$BACKUP" -eq 1 ]; then
+    local b="$HOME/jimkit-removed-$(date +%Y%m%d-%H%M%S)"
+    mkdir -p "$b"; chmod 700 "$b"
+    [ ! -f .env ] || cp -p .env "$b/env"
+    # (a stopped container can be copied from too; no file just means nothing was ever changed in Settings)
+    "${COMPOSE[@]}" cp jimkit:/data/jimkit.config.json "$b/jimkit.config.json" >/dev/null 2>&1 || true
+    say "Saved .env$([ -f "$b/jimkit.config.json" ] && echo " and your settings") to ${b/#$HOME/\~}"
+  fi
+
+  # the data volume's real name, from the container, before it is gone (compose names it after the folder)
+  local vols="" ours=0
+  vols="$(docker inspect jimkit --format '{{range .Mounts}}{{if eq .Type "volume"}}{{.Name}} {{end}}{{end}}' 2>/dev/null || true)"
+  # the fixed container name `jimkit` is only removed by force when it belongs to this folder
+  [ "$(docker inspect jimkit --format '{{index .Config.Labels "com.docker.compose.project.working_dir"}}' 2>/dev/null || true)" = "$ROOT" ] && ours=1
+  if [ "$DATA" -eq 1 ]; then "${COMPOSE[@]}" down -v --remove-orphans 2>/dev/null || { [ "$ours" -eq 1 ] && docker rm -f jimkit >/dev/null 2>&1; } || true
+  else "${COMPOSE[@]}" down --remove-orphans 2>/dev/null || { [ "$ours" -eq 1 ] && docker rm -f jimkit >/dev/null 2>&1; } || true; fi
+  if [ -n "$(docker ps -aq --filter name=^jimkit$ 2>/dev/null)" ]; then warn "The container is still there (it may belong to another install). See: docker ps -a"; else say "Container removed."; fi
+  # shellcheck disable=SC2086
+  [ -z "${images// }" ] || docker image rm $images >/dev/null 2>&1 || true
+  for d in "${links[@]}"; do rm -f "$d"; done
+  if [ "$DATA" -eq 1 ]; then
+    local v left=""
+    for v in $vols; do docker volume rm "$v" >/dev/null 2>&1 || true; docker volume inspect "$v" >/dev/null 2>&1 && left="$left $v"; done
+    if [ -n "$left" ]; then warn "The data volume is still there:$left (remove it with: docker volume rm$left)"; else say "Data volume deleted."; fi
+  fi
+  if [ "$FILES" -eq 1 ]; then cd /; rm -rf "$ROOT"; say "Folder deleted."; fi
+  say "Jimkit is removed."
+  [ "$DATA" -eq 1 ] || echo "    Your data volume is still there. Install again and it is picked up; or delete it with: docker volume rm <project>_jimkit-data"
+  [ "$FILES" -eq 1 ] || echo "    The folder $ROOT is still there (with your .env)."
+}
+
+case "${1:-help}" in
+  update)  shift; cmd_update "$@" ;;
+  status)  cmd_status ;;
+  version|-v|--version) cmd_version ;;
+  logs)    shift; cmd_logs "$@" ;;
+  restart) cmd_restart ;;
+  delete|remove|uninstall) shift; cmd_delete "$@" ;;
+  help|-h|--help) sed -n '2,/^set -/p' "$SELF" | grep '^#' | sed 's/^# \{0,1\}//' ;;
+  *) die "unknown command: $1 (try: jimkit help)" ;;
+esac

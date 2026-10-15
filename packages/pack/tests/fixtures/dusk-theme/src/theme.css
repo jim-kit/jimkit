@@ -1,0 +1,5 @@
+:root[data-theme="dusk"] { --color-bg: #1b1a24; --color-surface: #23222e; --color-fg: #e6e3f2; }
+:root[data-theme="dusk"][data-mode="light"] { --color-bg: #efedf6; --color-fg: #1d1b2a; }
+:root[data-theme="dusk"] .jk-card { border-radius: 14px; }
+@media (hover: hover) { :root[data-theme="dusk"] .jk-card:hover { translate: 0 -3px; } }
+@keyframes dusk-in { from { opacity: 0; } to { opacity: 1; } }

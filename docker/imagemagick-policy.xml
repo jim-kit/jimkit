@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Toolbox: ImageMagick may only touch the formats the registry uses, and nothing that reaches out. -->
+<policymap>
+  <policy domain="resource" name="memory" value="1GiB"/>
+  <policy domain="resource" name="map" value="2GiB"/>
+  <policy domain="resource" name="disk" value="4GiB"/>
+  <policy domain="resource" name="width" value="32KP"/>
+  <policy domain="resource" name="height" value="32KP"/>
+  <policy domain="resource" name="area" value="512MP"/>
+  <policy domain="resource" name="time" value="1800"/>
+  <policy domain="delegate" rights="none" pattern="*"/>
+  <policy domain="coder" rights="none" pattern="*"/>
+  <policy domain="coder" rights="read|write" pattern="{JPEG,PNG,WEBP,AVIF,HEIC,GIF,BMP,TIFF,ICO}"/>
+  <policy domain="path" rights="none" pattern="@*"/>
+  <policy domain="filter" rights="none" pattern="*"/>
+</policymap>

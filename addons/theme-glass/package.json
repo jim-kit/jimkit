@@ -1,0 +1,21 @@
+{
+  "name": "@jimkit/addon-theme-glass",
+  "version": "0.1.0",
+  "description": "Frosted, translucent panels over soft glows taken from the accent colour, with short, springy motion.",
+  "license": "AGPL-3.0-or-later",
+  "type": "module",
+  "jimkit": {
+    "id": "theme-glass",
+    "name": "Glass theme",
+    "description": "Frosted, translucent panels over soft glows taken from the accent colour, with short, springy motion.",
+    "tools": [],
+    "themes": [
+      {
+        "id": "glass",
+        "name": "Glass",
+        "blurb": "Frosted panels over soft colour",
+        "order": 20
+      }
+    ]
+  }
+}

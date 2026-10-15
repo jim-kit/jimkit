@@ -1,0 +1,54 @@
+{
+  "name": "@jimkit/addon-hash",
+  "version": "0.1.0",
+  "description": "Hash text or any file: MD5, SHA-1/256/384/512, CRC-32.",
+  "license": "AGPL-3.0-or-later",
+  "type": "module",
+  "exports": {
+    "./client": "./src/client.ts"
+  },
+  "peerDependencies": {
+    "@jimkit/sdk": "*",
+    "@jimkit/ui": "*",
+    "lucide-react": "*",
+    "react": "^19.0.0"
+  },
+  "jimkit": {
+    "id": "hash",
+    "name": "Hashes",
+    "description": "Checksums of text or files.",
+    "tools": [
+      {
+        "id": "hash",
+        "category": "inspect",
+        "name": "Hashes",
+        "blurb": "MD5, SHA-256 and the rest, for text or files",
+        "icon": "Fingerprint",
+        "keywords": [
+          "checksum",
+          "sha",
+          "md5",
+          "crc",
+          "verify"
+        ]
+      }
+    ],
+    "fileActions": [
+      {
+        "id": "hash-file",
+        "tool": "hash",
+        "label": "Hash this file",
+        "icon": "Fingerprint",
+        "accept": {
+          "mime": [
+            "*/*"
+          ],
+          "ext": [
+            "*"
+          ]
+        },
+        "priority": -10
+      }
+    ]
+  }
+}

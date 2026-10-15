@@ -1,0 +1,14 @@
+{
+  "name": "jimkit-kit-list",
+  "version": "1.0.0",
+  "description": "Every tool in one plain list.",
+  "author": "Ada Lovelace",
+  "peerDependencies": { "@jimkit/sdk": "*", "@jimkit/ui": "*", "react": "^19.0.0" },
+  "jimkit": {
+    "id": "list-theme",
+    "name": "List",
+    "description": "Every tool in one plain list.",
+    "tools": [],
+    "themes": [{ "id": "list", "name": "List", "blurb": "Everything in one plain list", "layout": "list" }]
+  }
+}

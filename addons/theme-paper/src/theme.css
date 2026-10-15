@@ -1,0 +1,49 @@
+/* Paper theme: every rule is scoped to :root[data-theme="paper"], so it does nothing until the theme is chosen. */
+/* ───────── paper ───────── */
+/* Warm paper and ink: cream surfaces, brown-black text, thin warm lines and a serif for page titles. The same look as the website. */
+:root[data-theme="paper"] {
+  --color-bg: #15110d;
+  --color-surface: #1e1913;
+  --color-raised: #241e17;
+  --color-raised-2: #2c251c;
+  --color-line: #3a3126;
+  --color-line-strong: #5a4d3b;
+  --color-fg: #f1e8d8;
+  --color-dim: #bcb09a;
+  --color-faint: #8d826f;
+  --color-tint: rgb(255 240 215 / 0.05);
+  --color-tint-2: rgb(255 240 215 / 0.1);
+  --color-field: rgb(0 0 0 / 0.25);
+  --color-ok: #7fc79f;
+  --color-warn: #f0c36a;
+  --color-bad: #f08a80;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 10px;
+  --radius-2xl: 14px;
+  --radius-3xl: 18px;
+  --dur: 180ms;
+  --lift: 0 12px 24px -16px rgb(0 0 0 / 0.6);
+  --font-display: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+}
+:root[data-mode="light"][data-theme="paper"] {
+  --color-bg: #efe8da;
+  --color-surface: #f8f3e8;
+  --color-raised: #fcf9f2;
+  --color-raised-2: #f3ecdd;
+  --color-line: #d8cdb8;
+  --color-line-strong: #b5a88e;
+  --color-fg: #1a1510;
+  --color-dim: #574d3f;
+  --color-faint: #857a69;
+  --color-tint: rgb(26 21 16 / 0.05);
+  --color-tint-2: rgb(26 21 16 / 0.09);
+  --color-field: #fffcf5;
+  --color-ok: #1f6b45;
+  --color-warn: #8a5a00;
+  --color-bad: #b3261e;
+  --lift: 0 12px 24px -16px rgb(60 40 10 / 0.35);
+}
+/* page titles: serif in Paper, the plain system face elsewhere (Metro keeps its own light weight) */
+:root[data-theme="paper"] .jk-display { font-family: var(--font-display); font-weight: 500; letter-spacing: -0.02em; }

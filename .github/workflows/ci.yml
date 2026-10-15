@@ -1,0 +1,35 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build -w apps/web
+      - run: npm run build:site
+        env:
+          NEXT_PUBLIC_SITE_URL: https://example.org
+
+  image-lite:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -f docker/Dockerfile --build-arg VARIANT=lite -t jimkit:lite .
+      - name: Starts and answers
+        run: |
+          docker run -d --name jk-ci -p 3000:3000 jimkit:lite
+          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:3000/api/health && exit 0; sleep 2; done
+          docker logs jk-ci
+          exit 1

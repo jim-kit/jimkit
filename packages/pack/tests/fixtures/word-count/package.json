@@ -1,0 +1,13 @@
+{
+  "name": "word-count-fixture",
+  "version": "1.2.0",
+  "private": true,
+  "type": "module",
+  "author": "Ada Lovelace <ada@example.com>",
+  "jimkit": {
+    "id": "word-count",
+    "name": "Word count",
+    "description": "Counts words, characters and lines.",
+    "tools": [{ "id": "word-count-tool", "category": "utilities", "name": "Word count", "blurb": "Counts words, characters and lines", "icon": "PenLine", "keywords": ["length"] }]
+  }
+}

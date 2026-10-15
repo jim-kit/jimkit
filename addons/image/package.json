@@ -1,0 +1,66 @@
+{
+  "name": "@jimkit/addon-image",
+  "version": "0.1.0",
+  "description": "An image editor: crop, straighten, adjust, filters, draw and text.",
+  "license": "AGPL-3.0-or-later",
+  "type": "module",
+  "exports": {
+    "./client": "./src/client.ts"
+  },
+  "peerDependencies": {
+    "@jimkit/sdk": "*",
+    "@jimkit/ui": "*",
+    "lucide-react": "*",
+    "react": "^19.0.0"
+  },
+  "jimkit": {
+    "id": "image",
+    "name": "Image editor",
+    "description": "Crop, rotate, filters, draw, add text.",
+    "tools": [
+      {
+        "id": "image-editor",
+        "category": "edit",
+        "name": "Image editor",
+        "blurb": "Crop, rotate, filters, draw, text",
+        "icon": "Crop",
+        "keywords": [
+          "photo",
+          "picture",
+          "crop",
+          "rotate",
+          "filter",
+          "annotate"
+        ]
+      }
+    ],
+    "fileActions": [
+      {
+        "id": "edit-image",
+        "tool": "image-editor",
+        "label": "Edit this image",
+        "icon": "Crop",
+        "accept": {
+          "ext": [
+            "jpg",
+            "jpeg",
+            "png",
+            "webp",
+            "gif",
+            "avif",
+            "bmp"
+          ],
+          "mime": [
+            "image/jpeg",
+            "image/png",
+            "image/webp",
+            "image/gif",
+            "image/avif",
+            "image/bmp"
+          ]
+        },
+        "priority": 40
+      }
+    ]
+  }
+}

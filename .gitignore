@@ -1,0 +1,19 @@
+node_modules/
+.next/
+apps/web/src/generated/
+apps/web/next-env.d.ts
+*.tsbuildinfo
+.env
+.env.*
+!.env.example
+data/
+dist/
+coverage/
+# written by `jimkit update`: copies of .env and the settings
+backups/
+# the data folder `npm run dev` uses when JIMKIT_DATA_DIR is not set (settings, installed kits)
+.jimkit-data/
+# the website, built
+apps/site/out/
+# Cloudflare deploy scratch
+.wrangler/

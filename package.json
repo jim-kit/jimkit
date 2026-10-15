@@ -1,0 +1,35 @@
+{
+  "name": "jimkit",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A self-hosted toolkit you extend with addons: convert, edit and inspect files, write, hash, format. Runs in Docker or a Proxmox LXC.",
+  "license": "AGPL-3.0-or-later",
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*",
+    "addons/*"
+  ],
+  "bin": {
+    "jimkit": "cli/jimkit.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "gen": "node scripts/gen-addons.mjs",
+    "dev": "node scripts/gen-addons.mjs && npm run dev -w apps/web",
+    "build": "node scripts/gen-addons.mjs && npm run build -w apps/web",
+    "start": "npm run start -w apps/web",
+    "test": "vitest run",
+    "typecheck": "node scripts/gen-addons.mjs && tsc --noEmit -p apps/web && tsc --noEmit -p apps/site",
+    "jimkit": "node cli/jimkit.mjs",
+    "dev:site": "npm run dev -w apps/site",
+    "build:site": "node scripts/gen-addons.mjs && npm run build -w apps/site"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.0",
+    "vitest": "^3.2.0",
+    "@types/node": "^22.0.0"
+  }
+}

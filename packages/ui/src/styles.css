@@ -1,0 +1,269 @@
+/*
+ * Jimkit design tokens and themes.
+ *
+ * Components never hard-code a colour, radius or duration: they use the Tailwind utilities generated from the tokens below
+ * (bg-bg, bg-surface, text-fg, border-line, rounded-xl, ...). A theme is just a block that re-declares the tokens, so every tool,
+ * including ones written by third parties, follows the theme without knowing it exists.
+ *
+ *   data-theme  basic | glass | metro            (the look)
+ *   data-mode   dark | light                      (every theme has both)
+ *   data-accent blue | teal | green | orange | pink | purple      (the highlight colour; a custom colour sets the variables itself)
+ */
+@import "./tokens.css";
+
+:root {
+  --accent: #0d6efd;
+  --accent-fg: #ffffff;
+  --accent-rgb: 13 110 253;
+  --hue: 250;
+  --dur: 150ms;
+  --blur: none;
+  --surface-glow: none;
+  --shadow: none;
+  /* the shadow of a card the pointer is over; a theme may add a glow */
+  --lift: 0 10px 22px -12px rgb(0 0 0 / 0.45);
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  /* every Tailwind `transition` follows the theme's speed, so Metro (0ms) and reduced motion stand still */
+  --default-transition-duration: var(--dur);
+  --default-transition-timing-function: var(--ease);
+  /* fills for a primary button, a selected chip and a slider's filled part (the image editor uses them) */
+  --grad: var(--color-accent);
+  --grad-h: var(--color-accent);
+  color-scheme: dark;
+}
+
+/* accents: the same six in every theme. A custom colour sets --accent, --accent-fg and --accent-rgb inline. */
+:root[data-accent="teal"]   { --accent: #0aa89a; --accent-rgb: 10 168 154; }
+:root[data-accent="green"]  { --accent: #198754; --accent-rgb: 25 135 84; }
+:root[data-accent="orange"] { --accent: #e8590c; --accent-rgb: 232 89 12; }
+:root[data-accent="pink"]   { --accent: #d63384; --accent-rgb: 214 51 132; }
+:root[data-accent="purple"] { --accent: #7950f2; --accent-rgb: 121 80 242; }
+/* ink: near-black on a light page, near-white on a dark one, so it always stands out from the page */
+:root[data-accent="ink"] { --accent: #f1f3f5; --accent-fg: #111418; --accent-rgb: 241 243 245; }
+:root[data-accent="ink"][data-mode="light"] { --accent: #212529; --accent-fg: #ffffff; --accent-rgb: 33 37 41; }
+
+/* ───────── light mode: the plain palette, which a theme may then refine below ───────── */
+:root[data-mode="light"] {
+  color-scheme: light;
+  --color-bg: #f1f3f5;
+  --color-surface: #ffffff;
+  --color-raised: #ffffff;
+  --color-raised-2: #f8f9fa;
+  --color-line: #dee2e6;
+  --color-line-strong: #adb5bd;
+  --color-fg: #212529;
+  --color-dim: #495057;
+  --color-faint: #6c757d;
+  --color-tint: rgb(0 0 0 / 0.04);
+  --color-tint-2: rgb(0 0 0 / 0.08);
+  --color-field: #ffffff;
+  --color-ok: #146c43;
+  --color-warn: #8a5d00;
+  --color-bad: #b02a37;
+}
+
+/* ───────── base ───────── */
+html, body { height: 100%; }
+body {
+  background-color: var(--color-bg);
+  color: var(--color-fg);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overscroll-behavior: none;
+  -webkit-tap-highlight-color: transparent;
+}
+::selection { background: rgb(var(--accent-rgb) / 0.35); }
+.scroll-hide { scrollbar-width: none; }
+.scroll-hide::-webkit-scrollbar { display: none; }
+/* for bars that have no padding of their own; with a p-* utility use pt-[calc(env(safe-area-inset-top)+...)] instead, because this rule wins over utilities */
+.pt-safe { padding-top: env(safe-area-inset-top); }
+.pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+
+/* Tailwind 4 leaves buttons with the default arrow. Anything you can press gets the hand; a utility class (cursor-text, ...) still wins. */
+@layer base {
+  button:not(:disabled), summary, select, a[href],
+  [role="button"]:not([aria-disabled="true"]), [role="radio"]:not([aria-disabled="true"]), [role="tab"], [role="menuitem"], [role="option"], [role="switch"],
+  input:is([type="checkbox"], [type="radio"], [type="file"], [type="color"], [type="range"]):not(:disabled),
+  label:has(input:is([type="checkbox"], [type="radio"]):not(:disabled)) { cursor: pointer; }
+  button:disabled, input:disabled, [aria-disabled="true"] { cursor: not-allowed; }
+}
+
+/* A panel: the one surface every card, rail and dialog is made from.
+   Colours and borders sit in the components layer, so a utility (border-b-0, border-accent, rounded-2xl) can still adjust them. */
+@layer components {
+  .jk-panel {
+    background: var(--color-surface);
+    border: 1px solid var(--color-line);
+  }
+  .jk-card { background: var(--color-raised); border: 1px solid var(--color-line); }
+}
+.jk-panel {
+  -webkit-backdrop-filter: var(--blur);
+  backdrop-filter: var(--blur);
+  box-shadow: var(--shadow);
+}
+/* a blur inside a blur is the expensive kind, and the panel behind has frosted the backdrop already */
+.jk-panel .jk-panel { -webkit-backdrop-filter: none; backdrop-filter: none; }
+
+/* pressable cards lift a little; the pointer must be a real one, so touch screens don't get a stuck hover */
+:root:not([data-flat]) .jk-card:is(button, a, [role="button"]) {
+  transition: translate var(--dur) var(--ease), scale var(--dur) var(--ease), box-shadow var(--dur) var(--ease), border-color var(--dur) var(--ease), background-color var(--dur) var(--ease);
+}
+@media (hover: hover) {
+  :root:not([data-flat]) .jk-card:is(button, a, [role="button"]):not(:disabled):hover { translate: 0 -2px; box-shadow: var(--lift); border-color: var(--color-line-strong); }
+  }
+:root:not([data-flat]) .jk-card:is(button, a, [role="button"]):not(:disabled):active { translate: 0 0; scale: 0.985; }
+
+.jk-focus:focus-visible, :is(button, a, select, [role="button"]):focus-visible {
+  outline: 2px solid rgb(var(--accent-rgb) / 0.7);
+  outline-offset: 2px;
+  animation: jk-ring var(--dur) var(--ease);
+}
+/* the focus ring settles in from a little further out */
+@keyframes jk-ring { from { outline-color: transparent; outline-offset: 6px; } }
+/* the image editor tags its main buttons (Export, Download) with data-primary */
+[data-primary] { background: var(--grad); }
+.kbd {
+  font-family: var(--font-mono); font-size: 11px; line-height: 1; padding: 3px 6px; border-radius: 5px;
+  color: var(--color-dim); background: var(--color-tint); border: 1px solid var(--color-line);
+}
+
+/* inputs sit in the glass: inset, a touch darker, and a soft halo when you type */
+:root:not([data-flat]) .bg-field { transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease); }
+
+/* tiles: a colour square holding an icon. Each theme decides what that looks like, from the tile's --hue */
+.jk-tile {
+  display: grid; place-items: center; flex-shrink: 0;
+  color: #fff;
+  background: oklch(0.52 0.14 var(--hue));
+  border-radius: var(--radius-lg);
+}
+:root[data-mode="light"] .jk-tile { background: oklch(0.93 0.05 var(--hue)); color: oklch(0.38 0.12 var(--hue)); }
+:root:not([data-flat]) .jk-tile { transition: box-shadow var(--dur) var(--ease); }
+/* a tile never changes size when it is pointed at: only its icon moves (see "icon motion") */
+
+/* a tile used as a big block (the Start screen, or any layout that wants one): same colour as .jk-tile, but laid out as a card, not centred */
+.jk-block { display: flex; flex-direction: column; justify-content: space-between; align-items: stretch; place-items: normal; text-align: left; border-radius: 0; }
+
+/* motion: every animation reads --dur, so a theme can turn them all off (metro).
+   They fill backwards only: a finished animation that keeps its end state would stop a child's backdrop-filter from seeing the page. */
+@keyframes jk-pop { from { opacity: 0; transform: translateY(-6px) scale(0.97); } to { opacity: 1; transform: none; } }
+@keyframes jk-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes jk-rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@keyframes jk-open { from { opacity: 0; transform: translateY(10px) scale(0.985); } }
+@keyframes jk-slide { from { opacity: 0; transform: translateX(28px); } }
+@keyframes jk-spin { to { transform: rotate(360deg); } }
+@keyframes jk-sheet { from { transform: translateY(100%); } to { transform: none; } }
+.jk-sheet { animation: jk-sheet calc(var(--dur) * 1.6) var(--ease) backwards; }
+@media (min-width: 640px) { .jk-sheet { animation: jk-pop var(--dur) var(--ease) backwards; } }
+.jk-pop { animation: jk-pop var(--dur) var(--ease) backwards; transform-origin: 50% 0; }
+.jk-fade { animation: jk-fade var(--dur) ease-out backwards; }
+.jk-rise { animation: jk-rise calc(var(--dur) * 1.8) var(--ease) backwards; animation-delay: calc(var(--i, 0) * var(--dur) * 0.2); }
+/* a tool window, and the settings panel: no fill after, so nothing stays a containing block for fixed children */
+.jk-open { animation: jk-open calc(var(--dur) * 1.4) var(--ease) backwards; }
+.jk-slide { animation: jk-slide calc(var(--dur) * 1.5) var(--ease) backwards; }
+/* cards that arrive together arrive one after another */
+.jk-rise:nth-child(2) { --i: 1; } .jk-rise:nth-child(3) { --i: 2; } .jk-rise:nth-child(4) { --i: 3; } .jk-rise:nth-child(5) { --i: 4; }
+.jk-rise:nth-child(6) { --i: 5; } .jk-rise:nth-child(7) { --i: 6; } .jk-rise:nth-child(8) { --i: 7; } .jk-rise:nth-child(n + 9) { --i: 8; }
+.jk-spin { animation: jk-fade var(--dur) ease-out 120ms backwards, jk-spin 0.8s linear infinite; }
+@media (prefers-reduced-motion: reduce) {
+  :root, :root[data-theme] { --dur: 0ms !important; }
+  .jk-pop, .jk-fade, .jk-rise, .jk-open, .jk-slide { animation: none; }
+  :root[data-theme] body::before { animation: none !important; }
+  [data-sonner-toast], [data-sonner-toast] * { transition-duration: 0ms !important; }
+}
+
+
+/* ───────── icon motion ─────────
+   A tile's icon moves when whatever holds it (a card, a button, a list row) is pointed at or focused. The tile says which motion with
+   data-anim (see ICON_MOTION in icons.tsx, and `iconAnimation` in a tool's manifest). Every duration reads --dur, so Metro (0) and
+   reduced motion show nothing. Strokes get a pathLength of 1, so one dash trick draws any shape. */
+@keyframes jk-ico-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes jk-ico-spin { 0% { transform: rotate(0); } 70% { transform: rotate(200deg); } 100% { transform: rotate(180deg); } }
+@keyframes jk-ico-tumble { 0% { transform: rotate(0); } 40% { transform: rotate(200deg); } 100% { transform: rotate(360deg); } }
+@keyframes jk-ico-wiggle { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-14deg); } 55% { transform: rotate(10deg); } 80% { transform: rotate(-4deg); } }
+/* the parts of an icon appear one after another, rising into place: no change of size */
+@keyframes jk-ico-pop { 0% { transform: translateY(3px); opacity: 0; } 70% { transform: translateY(-1px); opacity: 1; } 100% { transform: none; } }
+@keyframes jk-ico-bounce { 0%, 100% { transform: translateY(0); } 30% { transform: translateY(-3px); } 60% { transform: translateY(1px); } }
+@keyframes jk-ico-left { 0%, 100% { transform: translate(0, 0); } 45% { transform: translate(-2px, 0); } }
+@keyframes jk-ico-right { 0%, 100% { transform: translate(0, 0); } 45% { transform: translate(2px, 0); } }
+@keyframes jk-ico-in-a { 0%, 100% { transform: translate(0, 0); } 45% { transform: translate(2px, -2px); } }
+@keyframes jk-ico-in-b { 0%, 100% { transform: translate(0, 0); } 45% { transform: translate(-2px, 2px); } }
+@media (prefers-reduced-motion: no-preference) {
+  :root:not([data-flat]) :is(button, a, .jk-card, [role="button"], [role="option"]):is(:hover, :focus-visible) .jk-tile[data-anim] svg {
+    transform-box: fill-box; transform-origin: center;
+  }
+  :root:not([data-flat]) :is(button, a, .jk-card, [role="button"], [role="option"]):is(:hover, :focus-visible) .jk-tile {
+    &[data-anim="draw"] svg :is(path, line, polyline, polygon, circle, rect, ellipse) { stroke-dasharray: 1; animation: jk-ico-draw calc(var(--dur) * 4.5) var(--ease) backwards; }
+    &[data-anim="spin"] svg { animation: jk-ico-spin calc(var(--dur) * 4) var(--ease) both; }
+    &[data-anim="tumble"] svg { animation: jk-ico-tumble calc(var(--dur) * 4.5) var(--ease) both; }
+    &[data-anim="wiggle"] svg { animation: jk-ico-wiggle calc(var(--dur) * 4) ease-in-out both; transform-origin: 70% 70%; }
+    &[data-anim="bounce"] svg { animation: jk-ico-bounce calc(var(--dur) * 3.5) ease-out both; }
+    &[data-anim="pop"] svg > * { transform-box: fill-box; transform-origin: center; animation: jk-ico-pop calc(var(--dur) * 3) var(--ease) backwards; }
+    &[data-anim="pop"] svg > :nth-child(2) { animation-delay: calc(var(--dur) * 0.35); }
+    &[data-anim="pop"] svg > :nth-child(3) { animation-delay: calc(var(--dur) * 0.7); }
+    &[data-anim="pop"] svg > :nth-child(4) { animation-delay: calc(var(--dur) * 1.05); }
+    &[data-anim="pop"] svg > :nth-child(n + 5) { animation-delay: calc(var(--dur) * 1.4); }
+    &[data-anim="spread"] svg > :first-child { animation: jk-ico-left calc(var(--dur) * 3.5) var(--ease) both; }
+    &[data-anim="spread"] svg > :last-child { animation: jk-ico-right calc(var(--dur) * 3.5) var(--ease) both; }
+    &[data-anim="pinch"] svg > :nth-child(odd) { animation: jk-ico-in-a calc(var(--dur) * 3.5) var(--ease) both; }
+    &[data-anim="pinch"] svg > :nth-child(even) { animation: jk-ico-in-b calc(var(--dur) * 3.5) var(--ease) both; }
+  }
+}
+
+/* checkboxes and radios: drawn in CSS so the tick can scale in. Utilities (size-4) still resize them. */
+@layer base {
+  :root:not([data-flat]) input:is([type="checkbox"], [type="radio"]) {
+    appearance: none; flex-shrink: 0; display: inline-grid; place-content: center; vertical-align: middle;
+    width: 1.125rem; height: 1.125rem; margin: 0;
+    border: 1.5px solid var(--color-line-strong); background: var(--color-field);
+    transition: background-color var(--dur) var(--ease), border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease), scale var(--dur) var(--ease);
+  }
+  :root:not([data-flat]) input[type="checkbox"] { border-radius: min(var(--radius-sm), 6px); }
+  :root:not([data-flat]) input[type="radio"] { border-radius: 50%; }
+  :root:not([data-flat]) input:is([type="checkbox"], [type="radio"])::after {
+    content: ""; width: 0.65rem; height: 0.65rem; background: var(--color-accent-fg); scale: 0; transition: scale var(--dur) var(--ease);
+  }
+  :root:not([data-flat]) input[type="checkbox"]::after { clip-path: polygon(14% 52%, 0 68%, 40% 100%, 100% 22%, 84% 6%, 40% 66%); }
+  :root:not([data-flat]) input[type="radio"]::after { border-radius: 50%; width: 0.45rem; height: 0.45rem; }
+  :root:not([data-flat]) input:is([type="checkbox"], [type="radio"]):checked { background: var(--color-accent); border-color: var(--color-accent); }
+  :root:not([data-flat]) input:is([type="checkbox"], [type="radio"]):checked::after { scale: 1; }
+  :root:not([data-flat]) input:is([type="checkbox"], [type="radio"]):active:not(:disabled) { scale: 0.88; }
+  :root:not([data-flat]) input:is([type="checkbox"], [type="radio"]):disabled { opacity: 0.4; }
+}
+
+/* ───────── rendered Markdown (the text addon's preview, usable by any tool) ───────── */
+.jk-md { color: var(--color-fg); font-size: 15.5px; line-height: 1.7; overflow-wrap: anywhere; }
+.jk-md > :first-child { margin-top: 0; }
+.jk-md h1, .jk-md h2, .jk-md h3, .jk-md h4, .jk-md h5, .jk-md h6 { font-weight: 650; line-height: 1.25; margin: 1.6em 0 0.5em; }
+.jk-md h1 { font-size: 2em; padding-bottom: 0.3em; border-bottom: 1px solid var(--color-line); }
+.jk-md h2 { font-size: 1.5em; padding-bottom: 0.25em; border-bottom: 1px solid var(--color-line); }
+.jk-md h3 { font-size: 1.2em; }
+.jk-md h4, .jk-md h5, .jk-md h6 { font-size: 1em; color: var(--color-dim); }
+.jk-md p, .jk-md ul, .jk-md ol, .jk-md blockquote, .jk-md pre, .jk-md table { margin: 0 0 1em; }
+.jk-md a { color: var(--color-accent); text-decoration: underline; text-underline-offset: 3px; }
+.jk-md ul, .jk-md ol { padding-left: 1.5em; }
+.jk-md ul { list-style: disc; } .jk-md ol { list-style: decimal; }
+.jk-md li { margin: 0.25em 0; } .jk-md li > ul, .jk-md li > ol { margin: 0.25em 0 0; }
+.jk-md li.task { list-style: none; margin-left: -1.3em; } .jk-md li.task input { margin-right: 0.5em; accent-color: var(--accent); }
+.jk-md blockquote { border-left: 3px solid rgb(var(--accent-rgb) / 0.6); padding: 0.1em 1em; color: var(--color-dim); background: var(--color-tint); }
+.jk-md blockquote p:last-child { margin-bottom: 0; }
+.jk-md code { font-family: var(--font-mono); font-size: 0.88em; background: var(--color-tint-2); padding: 0.15em 0.4em; border-radius: 5px; }
+.jk-md pre { background: var(--color-field); border: 1px solid var(--color-line); border-radius: var(--radius-lg); padding: 14px 16px; overflow-x: auto; }
+.jk-md pre code { background: none; padding: 0; font-size: 0.85em; line-height: 1.6; }
+.jk-md hr { border: 0; border-top: 1px solid var(--color-line-strong); margin: 2em 0; }
+.jk-md table { border-collapse: collapse; display: block; overflow-x: auto; }
+.jk-md th, .jk-md td { border: 1px solid var(--color-line-strong); padding: 0.45em 0.8em; }
+.jk-md th { background: var(--color-tint); font-weight: 600; }
+.jk-md del { color: var(--color-faint); }
+
+/* a colour picked for one tool: exactly that, whatever the theme would have chosen (the extra :root outweighs every theme rule above) */
+:root:root:root .jk-tile.jk-hex { background: var(--own); color: var(--own-fg); box-shadow: none; }
+
+/* the logo: the accent, lifted in lightness so it reads brighter than a button; hue and saturation stay */
+.jk-logo path { fill: var(--color-accent); stroke: var(--color-accent); }
+@supports (color: oklch(from red l c h)) {
+  .jk-logo path { fill: oklch(from var(--color-accent) calc(l + 0.04) c h); stroke: oklch(from var(--color-accent) calc(l + 0.04) c h); }
+  :root[data-mode="dark"] .jk-logo path { fill: oklch(from var(--color-accent) calc(l + 0.13) calc(c * 1.04) h); stroke: oklch(from var(--color-accent) calc(l + 0.13) calc(c * 1.04) h); }
+}

@@ -1,0 +1,10 @@
+# Cloudflare Pages reads this file. It is the same set of headers apps/site/deploy/nginx.conf sends.
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: SAMEORIGIN
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), interest-cohort=()
+  Strict-Transport-Security: max-age=31536000
+
+/_next/static/*
+  Cache-Control: public, max-age=31536000, immutable
