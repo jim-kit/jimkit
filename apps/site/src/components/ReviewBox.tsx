@@ -9,7 +9,7 @@ const field = "bg-field w-full rounded-lg border border-line-strong px-3 py-2.5 
 
 /** Write, change or delete your own review of a kit. The database allows one per person, never of your own kit. */
 export function ReviewBox({ repo, versions }: { repo: string; versions: string[] }) {
-  const { session, login } = useGitHubSession();
+  const { session, login, problem } = useGitHubSession();
   const [rating, setRating] = useState(5);
   const [body, setBody] = useState("");
   const [version, setVersion] = useState("");
@@ -47,7 +47,7 @@ export function ReviewBox({ repo, versions }: { repo: string; versions: string[]
 
   return (
     <div id="review" className="mt-6 max-w-[34rem] scroll-mt-24">
-      <GitHubAccount login={login} loading={session === undefined} />
+      <GitHubAccount login={login} loading={session === undefined} problem={problem} />
       {login && login === owner && <p className="mt-4 text-[14.5px] text-dim">You can&apos;t review your own kit.</p>}
       {login && login !== owner && (
         <form onSubmit={save} className="mt-5">

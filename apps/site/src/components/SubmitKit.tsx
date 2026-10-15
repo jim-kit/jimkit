@@ -10,7 +10,7 @@ interface Mine { repo: string; status: Status; note: string | null }
 const field = "bg-field w-full rounded-lg border border-line-strong px-3 py-2.5 text-[15px] outline-none focus:border-accent";
 
 export function SubmitKit() {
-  const { session, login } = useGitHubSession();
+  const { session, login, problem } = useGitHubSession();
   const [repo, setRepo] = useState("");
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
@@ -54,7 +54,7 @@ export function SubmitKit() {
 
   return (
     <div className="mt-8 max-w-[34rem]">
-      <GitHubAccount login={login} loading={session === undefined} />
+      <GitHubAccount login={login} loading={session === undefined} problem={problem} />
       {session === null && <p className="mt-4 text-[14.5px] text-dim">Signing in tells the registry which GitHub account you are, so you can submit your own kits.</p>}
       {session && !login && <p className="mt-4 text-[14.5px] text-dim">This sign-in isn&apos;t a GitHub account. Sign out and sign in with GitHub.</p>}
       {login && (
