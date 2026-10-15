@@ -29,16 +29,16 @@ export function LookControls({ stacked }: { stacked?: boolean }) {
   const hex = accentHex(accent) ?? "#ff4d1f";
   return (
     <div className={stacked ? "flex flex-col gap-4" : "flex items-center gap-2"}>
-      <Seg label="Look" small value={theme as string} options={THEMES.map((t) => ({ id: t.id as string, label: t.name, title: t.blurb }))} onChange={(t) => setTheme(t === theme ? "paper" : (t as Theme))} />
+      <Seg label="Look" compact value={theme as string} options={THEMES.map((t) => ({ id: t.id as string, label: t.name, title: t.blurb }))} onChange={(t) => setTheme(t === theme ? "paper" : (t as Theme))} />
       <button onClick={() => setMode(mode === "dark" ? "light" : "dark")} aria-label={mode === "dark" ? "Switch to light mode" : "Switch to dark mode"} title={mode === "dark" ? "Light mode" : "Dark mode"} className="jk-btn grid size-[34px] shrink-0 place-items-center rounded-lg border border-line-strong text-dim hover:bg-tint-2 hover:text-fg">
         {mode === "dark" ? <Sun size={16} /> : <Moon size={16} />}
       </button>
-      <div className={`relative flex items-center gap-1.5 ${stacked ? "" : "max-xl:hidden"}`} role="group" aria-label="Accent colour">
+      <div className={`relative flex h-[34px] shrink-0 items-center gap-2 rounded-lg border border-line-strong px-2.5 ${stacked ? "" : "max-xl:hidden"}`} role="group" aria-label="Accent colour">
         {WARM.map(([name, h]) => {
           const id = name === "ink" ? "ink" : `hex-${h.slice(1)}`;
-          return <button key={name} onClick={() => { setAccent(id); setCustom(false); }} aria-label={name} aria-pressed={accent === id} title={name === "ink" ? "Black on light, white on dark" : name} className="size-[18px] rounded-full" style={{ background: name === "ink" ? "var(--color-fg)" : h, boxShadow: accent === id ? "0 0 0 2px var(--color-bg), 0 0 0 4px var(--color-fg)" : undefined }} />;
+          return <button key={name} onClick={() => { setAccent(id); setCustom(false); }} aria-label={name} aria-pressed={accent === id} title={name === "ink" ? "Black on light, white on dark" : name} className="size-4 shrink-0 rounded-full" style={{ background: name === "ink" ? "var(--color-fg)" : h, boxShadow: accent === id ? "0 0 0 2px var(--color-bg), 0 0 0 3.5px var(--color-fg)" : undefined }} />;
         })}
-        <button onClick={() => setCustom((c) => !c)} aria-expanded={custom} aria-label="Pick any colour" title="Any colour" className="size-[18px] rounded-full border border-line-strong" style={{ background: "conic-gradient(#ff4d1f, #f2a900, #25b878, #8a63ff, #e8407a, #ff4d1f)" }} />
+        <button onClick={() => setCustom((c) => !c)} aria-expanded={custom} aria-label="Pick any colour" title="Any colour" className="size-4 shrink-0 rounded-full" style={{ background: "conic-gradient(#ff4d1f, #f2a900, #25b878, #8a63ff, #e8407a, #ff4d1f)" }} />
         {custom && (
           <div className="jk-panel jk-pop absolute right-0 top-full z-[60] mt-3 w-[236px] rounded-xl p-3 shadow-2xl">
             <ColorPicker value={hex} onChange={(h) => { const a = customAccent(h); if (a && hexToHsv(h)) setAccent(a); }} />

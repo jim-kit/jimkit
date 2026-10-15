@@ -34,7 +34,8 @@ export function Btn({ children, onClick, primary, disabled, title, className = "
 }
 
 /** Segmented control. The highlight slides from one option to the next. */
-export function Seg<T extends string>({ value, options, onChange, label, small }: { value: T; options: readonly { id: T; label: ReactNode; title?: string }[]; onChange: (v: T) => void; label: string; small?: boolean }) {
+/** `compact` is the toolbar form: 34 px tall with the same corners and border as the buttons next to it. */
+export function Seg<T extends string>({ value, options, onChange, label, small, compact }: { value: T; options: readonly { id: T; label: ReactNode; title?: string }[]; onChange: (v: T) => void; label: string; small?: boolean; compact?: boolean }) {
   const root = useRef<HTMLDivElement>(null);
   const [bar, setBar] = useState<{ x: number; w: number; slide: boolean } | null>(null);
   useLayoutEffect(() => {
@@ -50,12 +51,12 @@ export function Seg<T extends string>({ value, options, onChange, label, small }
     return () => ro.disconnect();
   }, [value, options.length]);
   return (
-    <div ref={root} role="radiogroup" aria-label={label} className="relative flex shrink-0 rounded-xl border border-line bg-tint p-0.5">
-      {bar && <span aria-hidden className={cx("jk-seg-bar pointer-events-none absolute inset-y-0.5 left-0.5 rounded-[10px] bg-tint-2", bar.slide && "transition-[translate,width]")} style={{ width: bar.w, translate: `${bar.x - 2}px 0` }} />}
+    <div ref={root} role="radiogroup" aria-label={label} className={cx("relative flex shrink-0 border", compact ? "h-[34px] rounded-lg border-line-strong p-[3px]" : "rounded-xl border-line bg-tint p-0.5")}>
+      {bar && <span aria-hidden className={cx("jk-seg-bar pointer-events-none absolute bg-tint-2", compact ? "inset-y-[3px] left-[3px] rounded-md" : "inset-y-0.5 left-0.5 rounded-[10px]", bar.slide && "transition-[translate,width]")} style={{ width: bar.w, translate: `${bar.x - (compact ? 3 : 2)}px 0` }} />}
       {options.map((o) => (
         <button
           key={o.id} role="radio" aria-checked={value === o.id} title={o.title} onClick={() => onChange(o.id)}
-          className={cx("relative whitespace-nowrap rounded-[10px] transition", small ? "px-2.5 py-1 text-[12px]" : "px-3 py-1.5 text-[13px]", value === o.id ? "text-fg" : "text-faint hover:text-dim", value === o.id && !bar && "bg-tint-2")}
+          className={cx("relative whitespace-nowrap transition", compact ? "flex items-center rounded-md px-2.5 text-[12.5px]" : cx("rounded-[10px]", small ? "px-2.5 py-1 text-[12px]" : "px-3 py-1.5 text-[13px]"), value === o.id ? "text-fg" : "text-faint hover:text-dim", value === o.id && !bar && "bg-tint-2")}
         >
           {o.label}
         </button>
