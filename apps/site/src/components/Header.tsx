@@ -7,6 +7,8 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { accentHex, customAccent } from "@/lib/accent";
 import { THEMES, useLook, type Theme } from "@/lib/look";
+import { REPO_URL } from "@/lib/site";
+import { GitHubMark } from "./GitHubMark";
 import { Logo } from "./Logo";
 
 // the site's own accents are custom colours, so the logo, tiles and tools all take them
@@ -70,7 +72,7 @@ export function Header() {
           {NAV.map((n) => <Link key={n.href} href={n.href} className="whitespace-nowrap rounded-lg px-3 py-1.5 text-[14px] text-dim transition-colors hover:bg-tint-2 hover:text-fg">{n.label}</Link>)}
         </nav>
         <button onClick={() => window.dispatchEvent(new Event("jk-palette"))} className="jk-btn ml-auto hidden h-[34px] items-center gap-2 rounded-lg border border-line-strong px-3 text-[13px] text-dim hover:bg-tint-2 hover:text-fg lg:flex" aria-label="Search"><Search size={14} /> <span className="max-xl:sr-only">Search</span> <span className="kbd whitespace-nowrap">ctrl k</span></button>
-        <div className="hidden lg:block"><LookControls /></div>
+        <div className="hidden items-center gap-2 lg:flex"><LookControls />{REPO_URL && <a href={REPO_URL} rel="noopener" aria-label="Jimkit on GitHub" title="Jimkit on GitHub" className="jk-btn grid size-[34px] shrink-0 place-items-center rounded-lg border border-line-strong text-dim hover:bg-tint-2 hover:text-fg"><GitHubMark size={17} /></a>}</div>
         <button className="ml-auto grid size-10 place-items-center rounded-lg text-dim hover:bg-tint-2 lg:hidden" aria-label={open ? "Close menu" : "Open menu"} aria-expanded={open} onClick={() => setOpen(!open)}>{open ? <X size={20} /> : <MenuIcon size={20} />}</button>
       </div>
       {open && (
@@ -78,6 +80,7 @@ export function Header() {
           <nav className="flex flex-col" aria-label="Main">
             {NAV.map((n) => <Link key={n.href} href={n.href} onClick={() => setOpen(false)} className="border-b border-line py-3 text-[16px]">{n.label}</Link>)}
           </nav>
+          {REPO_URL && <a href={REPO_URL} rel="noopener" className="flex items-center gap-2.5 border-b border-line py-3 text-[16px]"><GitHubMark size={18} /> GitHub</a>}
           <div className="mt-5"><LookControls stacked /></div>
         </div>
       )}

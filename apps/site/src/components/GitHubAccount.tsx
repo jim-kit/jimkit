@@ -3,6 +3,7 @@
 import type { Session } from "@supabase/supabase-js";
 import { useEffect, useState } from "react";
 import { loginOf, signInWithGitHub, signOut, supabase } from "@/lib/supabase";
+import { GitHubMark } from "./GitHubMark";
 
 /** The signed-in GitHub session, once Supabase has looked: undefined while it is looking, null when nobody is signed in. */
 export function useGitHubSession(): { session: Session | null | undefined; login: string | null } {
@@ -29,6 +30,6 @@ export function GitHubAccount({ login, loading }: { login: string | null; loadin
   return login ? (
     <p className="flex flex-wrap items-center gap-3 text-[14px] text-dim">Signed in as <strong className="text-fg">{login}</strong><button onClick={() => void signOut()} className={btn}>Sign out</button></p>
   ) : (
-    <button onClick={() => void signInWithGitHub()} className="rounded-lg border border-accent bg-accent px-5 py-2.5 text-[14.5px] font-semibold text-accent-fg transition hover:brightness-95">Sign in with GitHub</button>
+    <button onClick={() => void signInWithGitHub()} className="inline-flex items-center gap-2.5 rounded-lg border border-accent bg-accent px-5 py-2.5 text-[14.5px] font-semibold text-accent-fg transition hover:brightness-95"><GitHubMark size={18} /> Sign in with GitHub</button>
   );
 }
